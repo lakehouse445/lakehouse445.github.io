@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Random Character Generator</title>
+<style>
+  body {
+    font-size: 200%;
+    line-height: 1.4;
+  }
+</style>
+<script>
+  // Generate a random character
+  function randomCharacter() {
+    var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+    return characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+
+  // Create a character at random places on the page
+  setInterval(function() {
+    var character = document.createElement('span');
+    character.innerHTML = randomCharacter();
+    character.style.position = 'absolute';
+    character.style.left = Math.random() * window.innerWidth + 'px';
+    character.style.top = Math.random() * window.innerHeight + 'px';
+    document.body.appendChild(character);
+  }, 1000);
+
+  // Add a button to clear all characters
+  var button = document.createElement('button');
+  button.innerHTML = 'Clear';
+  button.onclick = function() {
+    var characters = document.querySelectorAll('span');
+    for (var i = 0; i < characters.length; i++) {
+      document.body.removeChild(characters[i]);
+    }
+  }
+  document.body.appendChild(button);
+</script>
+</head>
+<body>
+  <h1>Random Character Generator</h1>
+  <p>Characters will be generated automatically.</p>
+</body>
+</html>

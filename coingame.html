@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Flipping Coin Game</title>
+  <style>
+    #coin {
+  width: 100px;
+  height: 100px;
+  perspective: 1000px;
+}
+
+#coin img {
+  width: 100%;
+  height: 100%;
+}
+
+#coin .side {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  visibility: hidden;
+}
+
+#coin .front {
+  transform: rotateY(0deg);
+  visibility: visible;
+}
+
+#coin .back {
+  transform: rotateY(180deg);
+}
+
+#coin.flipped .front {
+  transform: rotateY(180deg);
+  visibility: hidden;
+}
+
+#coin.flipped .back {
+  transform: rotateY(0deg);
+  visibility: visible;
+}
+  </style>
+</head>
+<body>
+  <div id="fake-currency-container">Fake currency: <span id="fake-currency">100</span></div>
+  <div id="coin">
+    <div id="front"><img src="https://lakehouse.design/heads.png" alt="Heads"></div>
+    <div id="back"><img src="https://lakehouse.design/tails.png" alt="Tails"></div>
+  </div>
+  <button onclick="chooseSide('heads')">Bet on heads</button>
+  <button onclick="chooseSide('tails')">Bet on tails</button>
+  <script>
+    const coin = document.getElementById("coin");
+
+    function flipCoin() {
+      coin.classList.toggle("flipped");
+    }
+
+    let fakeCurrency = 100;
+    let betAmount = 0;
+
+    function chooseSide(side) {
+      betAmount = prompt("How much fake currency do you want to bet?");
+      if (fakeCurrency >= betAmount) {
+        fakeCurrency -= betAmount;
+        flipCoin();
+        if (coin.classList.contains("flipped") && side === "tails" || !coin.classList.contains("flipped") && side === "heads") {
+          alert("Congratulations! You won " + (betAmount * 2) + " fake currency!");
+          fakeCurrency += (betAmount * 2);
+        } else {
+          if (fakeCurrency > 0) {
+            fakeCurrency -= 50;
+            alert("Sorry, you lost. You now have " + fakeCurrency + " fake currency.");
+          } else {
+            alert("Sorry, you lost and don't have any fake currency left. You can play again.");
+          }
+        }
+      } else {
+        alert("You don't have enough fake currency to place that bet.");
+      }
+      updateFakeCurrency();
+    }
+
+    function updateFakeCurrency() {
+      document.getElementById("fake-currency").innerHTML = fakeCurrency;
+    }
+
+    updateFakeCurrency();
+  </script>
+</body>
+</html

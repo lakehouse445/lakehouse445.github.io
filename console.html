@@ -1,0 +1,48 @@
+<html>
+<head>
+    <title>Console</title>
+</head>
+<body>
+    <h1>Console</h1>
+    <form onsubmit="return executeCommand(this.command.value)">
+        <input type="text" name="command" autofocus>
+        <input type="submit" value="Execute">
+    </form>
+    <div id="output"></div>
+    <script>
+        function executeCommand(command) {
+            switch (command) {
+                case "help":
+                    // Display the list of available commands
+                    displayOutput("Available commands: help, echo, cls, netstat");
+                    break;
+                case "echo":
+                    // Echo the input
+                    displayOutput(command);
+                    break;
+                case "cls":
+                    // Clear the output
+                    document.getElementById("output").innerHTML = "";
+                    break;
+                case "netstat":
+                    // Display the user's connecting IP and any other relevant information
+                    var ip = "123.456.789.0"; // Replace this with the actual IP address
+                    displayOutput("Connecting IP: " + ip);
+                    break;
+                default:
+                    // Display an error message for unknown commands
+                    displayOutput("Unknown command: " + command);
+            }
+
+            // Prevent the form from submitting
+            return false;
+        }
+
+        function displayOutput(output) {
+            // Display the output in the "output" div
+            var outputDiv = document.getElementById("output");
+            outputDiv.innerHTML += output + "<br>";
+        }
+    </script>
+</body>
+</html>

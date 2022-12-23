@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<?php
+header("Access-Control-Allow-Origin: *");
+...
+?>
+<html>
+<head>
+  <title>Comment Form</title>
+</head>
+<body>
+  <h1>Comment Form</h1>
+  <p>Welcome, <span id="username"></span>!</p>
+  <form id="comment-form">
+    <textarea id="comment" maxlength="256"></textarea>
+    <button type="submit">Post Comment</button>
+  </form>
+
+  <script>
+    // Generate a random username
+    const username = 'User' + Math.floor(Math.random() * 10000);
+    // Display the username
+    document.getElementById('username').innerHTML = username;
+
+    // Handle the form submission
+    const form = document.getElementById('comment-form');
+    form.onsubmit = function(event) {
+      event.preventDefault();
+      const comment = document.getElementById('comment').value;
+      // Validate the comment
+      if (comment.length > 256) {
+        alert('Comment must be 256 characters or less');
+        return;
+      }
+
+      // Send the comment to the server
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/comments');
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          alert('Comment posted!');
+        } else {
+          alert('Error posting comment');
+        }
+      };
+      xhr.send(JSON.stringify({ username: username, comment: comment }));
+    };
+  </script>
+</body>
+</html>

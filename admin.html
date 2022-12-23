@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title>Admin Page</title>
+</head>
+<body>
+	<!-- Input field to type a word -->
+	<input type="text" id="word" />
+
+	<!-- Button to submit the typed word -->
+	<button onclick="checkWord()">Submit</button>
+
+	<!-- Script to check if the typed word is "admin" and change the page accordingly -->
+	<script>
+	function checkWord() {
+		var word = document.getElementById("word").value;
+
+		// If the word is "admin", change the page to the special admin page
+		if (word === "admin") {
+			document.body.innerHTML = "<h1 style='color: black; background: yellow; text-align: center;'>ADMIN PAGE</h1><br><textarea></textarea>";
+		}
+	}
+	</script>
+</body>
+</html>

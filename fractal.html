@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fractal Generator</title>
+</head>
+<body>
+  <h1>Fractal Generator</h1>
+  <p>Enter a token to generate a unique fractal:</p>
+
+  <input type="text" id="tokenInput" placeholder="Enter a token">
+  <button id="submitButton">Submit</button>
+
+  <br><br>
+  <canvas id="fractalCanvas"></canvas>
+
+ <script>
+  // Generate a token and display it on the page
+  const token = Math.random().toString(36).substring(2);
+  document.write("<p>Your token: " + token + "</p>");
+
+  // Add an event listener to the submit button
+  const submitButton = document.getElementById("submitButton");
+  submitButton.addEventListener("click", function() {
+    // Get the token entered by the user
+    const enteredToken = document.getElementById("tokenInput").value;
+
+    // Generate a fractal based on the entered token and draw it on the canvas
+    const fractalCanvas = document.getElementById("fractalCanvas");
+    const ctx = fractalCanvas.getContext("2d");
+
+    // Define a function to generate and draw the fractal
+    function drawFractal(ctx, x1, y1, x2, y2, token, depth) {
+      // Stop recursing when the maximum depth is reached
+      if (depth >= 8) {
+        return;
+      }
+
+      // Calculate the midpoint of the line
+      const xMid = (x1 + x2) / 2;
+      const yMid = (y1 + y2) / 2;
+
+      // Rotate the line by a random angle based on the token
+      const angle = (token.charCodeAt(depth) - 97) * 10;
+      const xDelta = (x2 - x1) * Math.cos(angle) - (y2 - y1) * Math.sin(angle);
+      const yDelta = (x2 - x1) * Math.sin(angle) + (y2 - y1) * Math.cos(angle);
+
+      // Draw the rotated line
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(xMid + xDelta, yMid + yDelta);
+      ctx.stroke();
+
+      // Recurse to draw the next iteration of the fractal
+      drawFractal(ctx, x1, y1, xMid + xDelta, yMid + yDelta, token, depth + 1);
+      drawFractal(ctx, xMid + xDelta, yMid + yDelta, x2, y2, token, depth + 1);
+    }
+
+    // Generate and draw the fractal on the canvas
+    drawFractal(ctx, 50, 50, 400, 50, enteredToken, 0);
+  });
+</script>
+</body>
+</html>

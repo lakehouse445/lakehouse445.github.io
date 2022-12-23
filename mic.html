@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Microphone Input Soundwave</title>
+</head>
+<body>
+  <h1>Microphone Input Soundwave</h1>
+  <canvas id="soundwave"></canvas>
+
+  <script>
+    // Get the canvas element where the soundwave will be drawn
+    var canvas = document.getElementById("soundwave");
+    var context = canvas.getContext("2d");
+
+    // Create an audio context to listen to the microphone input
+    var audioContext = new AudioContext();
+
+    // Request access to the user's microphone
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+      // Connect the microphone input to the audio context
+      var source = audioContext.createMediaStreamSource(stream);
+
+      // Create an analyser node to analyse the microphone input
+      var analyser = audioContext.createAnalyser();
+      source.connect(analyser);
+
+      // Set the size of the soundwave canvas
+      canvas.width = window.innerWidth;
+      canvas.height = 100;
+
+      // Set the number of bars in the soundwave
+      var numBars = Math.round(canvas.width / 10);
+
+      // Create an array to store the soundwave data
+      var dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      // Start drawing the soundwave
+      draw();
+
+      function draw() {
+        // Clear the canvas
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Get the soundwave data from the analyser node
+        analyser.getByteFrequencyData(dataArray);
+
+        // Calculate the width of each bar in the soundwave
+        var barWidth = canvas.width / numBars;
+
+        // Draw the bars in the soundwave
+        for (var i = 0; i < numBars; i++) {
+          // Calculate the height of each bar based on the soundwave data
+          var barHeight = dataArray[i];
+
+          // Set the fill style for the bar
+          context.fillStyle = "rgb(" + barHeight + ", " + barHeight + ", " + barHeight + ")";
+
+          // Draw the bar
+          context.fillRect(i * barWidth, canvas.height, barWidth, -barHeight);
+        }
+
+        // Request the next animation frame and draw the soundwave again
+        requestAnimationFrame(draw);
+      }
+    });
+  </script>
+</body>
+</html>

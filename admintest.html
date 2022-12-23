@@ -1,0 +1,37 @@
+<html>
+<head>
+	<title>Admin Page</title>
+	<!-- Include VueJS and JQuery -->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+	<!-- Input field to type a word -->
+	<input type="text" id="word" v-model="word" />
+
+	<!-- Button to submit the typed word -->
+	<button @click="checkWord">Submit</button>
+
+	<!-- Script to check if the typed word is "admin" and change the page accordingly -->
+	<script>
+	var app = new Vue({
+		el: '#app',
+		data: {
+			word: '',
+			comment: '',
+		},
+		methods: {
+			checkWord: function() {
+				// If the word is "admin", change the page to the special admin page
+				if (this.word === "admin") {
+					$("body").html("<h1 style='color: black; background: yellow; text-align: center;'>ADMIN PAGE</h1><br><textarea id='comment' v-model='comment'></textarea><br><button @click='submitComment'>Submit Comment</button>");
+				}
+			},
+			submitComment: function() {
+				$("body").append("<br><br><p>" + this.comment + "</p>");
+			}
+		}
+	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fluid Simulation</title>
+</head>
+<body>
+  <canvas id="fluid-canvas" width="500" height="500"></canvas>
+  <script>
+      // FluidSimulation class
+      class FluidSimulation {
+        constructor(width, height) {
+          this.width = width;
+          this.height = height;
+          this.shapes = [];
+
+          // Set up the velocity field
+          this.vx = new Array(width * height).fill(0);
+          this.vy = new Array(width * height).fill(0);
+
+          // Set up the density field
+          this.density = new Array(width * height).fill(0);
+
+          // Set up the temperature field
+          this.temperature = new Array(width * height).fill(0);
+
+          // Set up the diffusion rates
+          this.diffusionRate = 0.1;
+          this.viscosity = 0.1;
+        }
+
+        // Update the simulation
+        update() {
+          // Update the velocity field based on the fluid's behavior
+          this.eulerStep(this.vx, this.vx0, this.viscosity, this.dt);
+          this.eulerStep(this.vy, this.vy0, this.viscosity, this.dt);
+
+          // Update the density field based on the fluid's behavior
+          this.eulerStep(this.density, this.density0, this.diffusionRate, this.dt);
+
+          // Update the temperature field based on the fluid's behavior
+          this.eulerStep(this.temperature, this.temperature0, this.diffusionRate, this.dt);
+        }
+
+        // Render the simulation on the given context
+        render(context) {
+          // Clear the canvas
+          context.clearRect(0, 0, this.width, this.height);
+
+          // Draw the shapes
+          this.shapes.forEach(shape => {
+            context.beginPath();
+            context.moveTo(shape.x1, shape.y1);
+            context.lineTo(shape.x2, shape.y2);
+            context.stroke();
+          });
+
+          // Draw the velocity field
+          for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+              context.beginPath();
+              context.moveTo(x, y);
+              context.lineTo(x + this.vx[y * this.width + x], y + this.vy[y * this.width + x]);
+              context.stroke();
+            }
+          }
+        }
+
+        // Add a shape to the simulation
+        addShape(x1, y1, x2, y2) {
+          this.shapes.push({ x1, y1, x2, y2 });
+        }
+        // Perform a single Euler step for the given field
+        eulerStep(field, field0, diffusionRate, dt) {
+          for (let y = 0; y < this.height; y++) {
+                for (let x = 0; x < this.width; x++) {
+                  field[y * this.width + x] =
+                        field0[y * this.width + x] +
+                          diffusionRate * (this.getNeighborAverage(field0, x, y) - field0[y * this.width + x]) * dt;
+                }
+          }
+        }
+
+  // Get the average value of the field at the neighbors of the given position
+  getNeighborAverage(field, x, y) {
+    let sum = 0;
+    let count = 0;
+
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        if (x + dx >= 0 && x + dx < this.width && y + dy >= 0 && y + dy < this.height) {
+          sum += field[(y + dy) * this.width + (x + dx)];
+          count++;
+        }
+      }
+    }
+
+    return sum / count;
+  }
+  }
+
+  // Set up the canvas
+  const canvas = document.getElementById('fluid-canvas');
+  const context = canvas.getContext('2d');
+
+  // Set up the fluid simulation
+  const fluid = new FluidSimulation(canvas.width, canvas.height);
+
+  // Set up event listeners to allow the user to draw shapes on the canvas
+  let isDrawing = false;
+  let startX = 0;
+  let startY = 0;
+
+  canvas.addEventListener('mousedown', event => {
+  isDrawing = true;
+  startX = event.offsetX;
+  startY = event.offsetY;
+  });
+
+  canvas.addEventListener('mousemove', event => {
+  if (isDrawing) {
+    // Clear the canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the current shape
+    context.beginPath();
+    context.moveTo(startX, startY);
+    context.lineTo(event.offsetX, event.offsetY);
+    context.stroke();
+  }
+  });
+
+  canvas.addEventListener('mouseup', event => {
+  isDrawing = false;
+
+  // Add the drawn shape to the fluid simulation
+  fluid.addShape(startX, startY, event.offsetX, event.offsetY);
+  });
+
+  // Set up a function to update and render the fluid simulation
+  function update() {
+  fluid.update();
+  fluid.render(context);
+
+  requestAnimationFrame(update);
+  }
+
+  // Start the update loop
+  update();
+
+  </script>
+</body>
+</html>
