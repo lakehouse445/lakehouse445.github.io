@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>First Site</title>
+</head>
+<body>
+  <h1>First Site</h1>
+
+  <!-- Form to send a message to the second site -->
+  <form id="send-message-form">
+    <label for="send-message">Send a message:</label><br>
+    <textarea id="send-message" name="send-message"></textarea><br>
+    <input type="submit" value="Send">
+  </form> 
+
+  <!-- JavaScript to send the message to the second site -->
+  <script>
+    document.getElementById('send-message-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  var message = document.getElementById('send-message').value;
+
+  // Send the message to the other site
+  fetch('https://othersite.com/receive-message', {
+    method: 'POST',
+    body: message
+  });
+
+  // Update the text area with the new message
+  var currentMessages = document.getElementById('message-box').value;
+  document.getElementById('message-box').value = currentMessages + message + "\n";
+});
+  </script>
+
+  <?php
+  // Connect to the database or read the file containing the received messages
+  $messages = array(); // replace this with code to retrieve the messages
+
+  // Concatenate the messages into a single string
+  $messageString = "";
+  foreach ($messages as $message) {
+    $messageString .= "$message\n";
+  }
+
+  // Update the text area with the concatenated messages
+  echo "<script>document.getElementById('message-box').value = '$messageString';</script>";
+?>
+</body>
+</html>
