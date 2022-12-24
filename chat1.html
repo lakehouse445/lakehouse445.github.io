@@ -13,37 +13,44 @@
     <input type="submit" value="Send">
   </form> 
 
-  <!-- JavaScript to send the message to the second site -->
+  <!-- Div to hold the received messages -->
+  <div id="received-messages">
+    <!-- Text area to display the received messages -->
+    <textarea id="message-box" readonly></textarea>
+  </div>
+
+  <!-- JavaScript to send the message to the second site and update the text area with the new message -->
   <script>
     document.getElementById('send-message-form').addEventListener('submit', function(event) {
-  event.preventDefault();
+      event.preventDefault();
 
-  var message = document.getElementById('send-message').value;
+      var message = document.getElementById('send-message').value;
 
-  // Send the message to the other site
-  fetch('https://othersite.com/receive-message', {
-    method: 'POST',
-    body: message
-  });
+      // Send the message to the second site
+      fetch('https://secondsite.com/receive-message', {
+        method: 'POST',
+        body: message
+      });
 
-  // Update the text area with the new message
-  var currentMessages = document.getElementById('message-box').value;
-  document.getElementById('message-box').value = currentMessages + message + "\n";
-});
+      // Update the text area with the new message
+      var currentMessages = document.getElementById('message-box').value;
+      document.getElementById('message-box').value = currentMessages + message + "\n";
+    });
   </script>
 
+  <!-- PHP script to retrieve and display the received messages -->
   <?php
-  // Connect to the database or read the file containing the received messages
-  $messages = array(); // replace this with code to retrieve the messages
+    // Connect to the database or read the file containing the received messages
+    $messages = array(); // replace this with code to retrieve the messages
 
-  // Concatenate the messages into a single string
-  $messageString = "";
-  foreach ($messages as $message) {
-    $messageString .= "$message\n";
-  }
+    // Concatenate the messages into a single string
+    $messageString = "";
+    foreach ($messages as $message) {
+      $messageString .= "$message\n";
+    }
 
-  // Update the text area with the concatenated messages
-  echo "<script>document.getElementById('message-box').value = '$messageString';</script>";
-?>
+    // Update the text area with the concatenated messages
+    echo "<script>document.getElementById('message-box').value = '$messageString';</script>";
+  ?>
 </body>
 </html>
