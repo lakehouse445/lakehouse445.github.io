@@ -161,11 +161,8 @@
     }
   }
   
-  // Start the visualizer when the blahj blah blah
-  document.getElementById('play-button').addEventListener('click', function() {
-  audioCtx.resume().then(function() {
-    requestAnimationFrame(visualize);
-  });
+document.getElementById('play-button').addEventListener('click', function() {
+  requestAnimationFrame(visualize);
 });
 
 darkModeButton.addEventListener('click', toggleDarkMode);
