@@ -166,6 +166,9 @@ document.getElementById('play-button').addEventListener('click', function() {
 });
 
 darkModeButton.addEventListener('click', toggleDarkMode);
+window.addEventListener('beforeunload', function() {
+  audioCtx.suspend();
+});
 </script>
 
 
