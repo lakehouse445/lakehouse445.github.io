@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Python Files</title>
+</head>
+<body>
+    <a href="wishes.py">wishes</a><br>
+    <a href="path/to/file2.py">Placeholder</a><br>
+    <a href="path/to/file3.py">Placeholder</a><br> 
+</body>
+</html>
