@@ -1,12 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <div class="marquee"> Python Files for CS Class </div>
   <head>
-  <title>My Python Files</title>
-</head>
-<body>
+    <title>My Python Files</title>
+    <style>
+      .marquee {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        box-sizing: border-box;
+        animation: marquee 50s linear infinite;
+      }
+      @keyframes marquee {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(-100%, 0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="marquee"> Python Files for CS Class </div>
     <a href="wishes.py">wishes</a><br>
     <a href="path/to/file2.py">Placeholder</a><br>
     <a href="path/to/file3.py">Placeholder</a><br> 
-</body>
+  </body>
 </html>
