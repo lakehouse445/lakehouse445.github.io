@@ -4,7 +4,7 @@
 <form>
   Enter the principal amount:<br>
   <input type="text" id="principal"><br>
-  Enter the annual interest rate:<br>
+  Enter the annual interest rate (%):<br>
   <input type="text" id="interestRate"><br>
   Enter the number of years:<br>
   <input type="text" id="numYears"><br>
@@ -24,6 +24,9 @@ function calculate() {
   principal = parseFloat(principal);
   interestRate = parseFloat(interestRate);
   numYears = parseInt(numYears);
+
+  // Convert the interest rate to a decimal (e.g. 5% becomes 0.05)
+  interestRate = interestRate / 100;
 
   // Calculate the total interest
   var totalInterest = principal * Math.pow((1 + interestRate), numYears) - principal;
