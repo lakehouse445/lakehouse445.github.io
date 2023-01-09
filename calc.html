@@ -1,0 +1,37 @@
+<html>
+<body>
+
+<form>
+  Enter the principal amount:<br>
+  <input type="text" id="principal"><br>
+  Enter the annual interest rate:<br>
+  <input type="text" id="interestRate"><br>
+  Enter the number of years:<br>
+  <input type="text" id="numYears"><br>
+  <input type="button" value="Calculate" onclick="calculate()">
+</form> 
+
+<p>Total interest: <span id="totalInterest"></span></p>
+
+<script>
+function calculate() {
+  // Get the user's input from the form
+  var principal = document.getElementById("principal").value;
+  var interestRate = document.getElementById("interestRate").value;
+  var numYears = document.getElementById("numYears").value;
+
+  // Convert the input strings to numbers
+  principal = parseFloat(principal);
+  interestRate = parseFloat(interestRate);
+  numYears = parseInt(numYears);
+
+  // Calculate the total interest
+  var totalInterest = principal * Math.pow((1 + interestRate), numYears) - principal;
+
+  // Display the total interest
+  document.getElementById("totalInterest").innerHTML = totalInterest.toFixed(2);
+}
+</script>
+
+</body>
+</html>
