@@ -84,6 +84,14 @@ playButton.addEventListener("click", function() {
 form.appendChild(playButton);
 
   // Set up the audio context and the visualizer
+  const stopButton = document.createElement("button");
+stopButton.innerHTML = "Stop";
+form.appendChild(stopButton);
+stopButton.addEventListener("click", function() {
+  audio.pause();
+  audio.currentTime = 0;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
 
   const audioCtx = new AudioContext();
 
