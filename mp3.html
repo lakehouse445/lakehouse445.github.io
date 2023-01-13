@@ -76,6 +76,12 @@
   const songSelect = document.getElementById('preselected-songs');
 
   const darkModeButton = document.getElementById('darkmode-btn');
+  const playButton = document.createElement("button");
+playButton.innerHTML = "Play";
+playButton.addEventListener("click", function() {
+  audioCtx.resume();
+});
+form.appendChild(playButton);
 
   // Set up the audio context and the visualizer
 
