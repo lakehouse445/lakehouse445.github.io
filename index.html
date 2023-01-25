@@ -1,85 +1,123 @@
-<h1>Top Level Directory</h1>
+<!DOCTYPE html>
+<html>
 
-<ul>
+<head>
+    <style>
+        a {
+          animation: rainbow 6s linear infinite;
+        }
+        
+        @keyframes rainbow {
+          0% {
+            color: red;
+          }
+          
+          16.666% {
+            color: orange;
+          }
+          
+          33.333% {
+            color: yellow;
+          }
+          
+          50% {
+            color: green;
+          }
+          
+          66.666% {
+            color: blue;
+          }
+          
+          83.333% {
+            color: purple;
+          }
+          
+          100% {
+            color: red;
+          }
+        }
+      </style>
+</head>
 
-<li>web_1<br />
+<body>
+  <h1>Top Level Directory</h1>
 
-<ul>
+  <ul>
 
-<li>sites_1
+    <li>web_1<br />
 
-<ul>
+      <ul>
 
-<li><a href="mic.html">mic</a></li>
+        <li>sites_1
 
-<li><a href="mp3.html">mp3 (broken 1/8/23)</a></li>
+          <ul>
 
-</ul>
+            <li><a href="mic.html">mic</a></li>
 
-</li>
+            <li><a href="mp3.html">mp3 (broken 1/8/23)</a></li>
 
-<li>sites_2
+          </ul>
 
-<ul>
+        </li>
 
-<li><a href="fractal.html">fractal</a></li>
+        <li>sites_2
 
-<li><a href="draw.html">draw (broken)</a></li>
+          <ul>
 
-</ul>
+            <li><a href="fractal.html">fractal</a></li>
 
-</li>
+            <li><a href="draw.html">draw (broken)</a></li>
 
-</ul>
+          </ul>
 
-</li>
+        </li>
 
-<li>web_2
+      </ul>
 
-<ul>
+    </li>
 
-<li>sites_3
+    <li>web_2
 
-<ul>
+      <ul>
 
-<li><a href="mp3-2.html">mp3 testing area (broken 1/8/23)</a></li>
+        <li>sites_3
 
-<li><a href="converter.html">converter (broken)</a></li>
+          <ul>
 
-</ul>
+            <li><a href="mp3-2.html">mp3 testing area (broken 1/8/23)</a></li>
 
-</li>
+            <li><a href="converter.html">converter (broken)</a></li>
 
-<li>sites_4
+          </ul>
 
-<ul>
+        </li>
 
-<li><a href="console.html">console</a></li>
+        <li>sites_4
 
-<li><a href="admin.html">admin password protection</a></li>
+          <ul>
 
-</ul>
+            <li><a href="console.html">console</a></li>
 
-</li>
+            <li><a href="admin.html">admin password protection</a></li>
 
-</ul>
+          </ul>
 
-</li>
+        </li>
 
-</ul>
+      </ul>
 
-<button id="darkmode" onclick="darkmodeFunction()">Dark Mode</button>
+    </li>
 
+  </ul>
 
+  <button id="darkmode" onclick="darkmodeFunction()">Dark Mode</button>
 
-<script>
+  <script>
+    function darkmodeFunction() {
+      document.body.style.backgroundColor = "#4C4E52";
+      document.body.style.color = "white";
+    }
+  </script>
+</body>
 
-function darkmodeFunction(){
-
-  document.body.style.backgroundColor = "#4C4E52";
-
-  document.body.style.color = "white";
-
-}
-
-</script>
+</html>
