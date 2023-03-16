@@ -52,6 +52,13 @@
             pointer-events: none;
             z-index: 10;
         }
+        
+        .bottom-left-link {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 11;
+        }
     </style>
 </head>
 <body>
@@ -63,6 +70,7 @@
         <li><a href="https://discord.gg/2e6yGYTX" target="_blank">Discord</a></li>
         <li><a href="https://tracker.gg/valorant/profile/riot/chaos%2312312/overview" target="_blank">Valorant</a></li>
     </ul>
+    <a class="bottom-left-link" href="https://lakehouse.design/old" target="_blank">Old Index</a>
     <canvas id="snowCanvas"></canvas>
     <script>
         const canvas = document.getElementById('snowCanvas');
