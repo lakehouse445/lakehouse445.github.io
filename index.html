@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAKEHOUSE.DESIGN</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Open+Sans&display=swap');
+
+        body {
+            background-color: black;
+            font-family: 'Open Sans', sans-serif;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            font-family: 'Lato', sans-serif;
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: space-between;
+            width: 50%;
+        }
+        li {
+            margin: 0 10px;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <!-- Add your previous HTML content here -->
+    <h1>LAKEHOUSE.DESIGN</h1>
+    <ul>
+        <li><a href="https://steamcommunity.com/id/honeyiyeetedthekids/" target="_blank">Steam</a></li>
+        <li><a href="https://open.spotify.com/user/nmrop8ickrlc2fv4ve83ku93v?si=4d64cd61ab0e420e" target="_blank">Spotify</a></li>
+        <li><a href="https://discord.gg/2e6yGYTX" target="_blank">Discord</a></li>
+        <li><a href="https://tracker.gg/valorant/profile/riot/chaos%2312312/overview" target="_blank">Valorant</a></li>
+    </ul>
+    <canvas id="snowCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('snowCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let snowflakesArray = [];
+        const numberOfSnowflakes = 200;
+
+        class Snowflake {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 5 + 1;
+                this.speedY = Math.random() * 1 + 0.5;
+                this.speedX = this.speedY * Math.tan((305 * Math.PI) / 180);
+            }
+
+            update() {
+                this.y += this.speedY;
+                if (this.y > canvas.height) {
+                    this.y = 0;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        function createSnowflakes() {
+            for (let i = 0; i < numberOfSnowflakes; i++) {
+                snowflakesArray.push(
+                    new Snowflake(Math.random() * canvas.width, Math.random() * canvas.height)
+                );
+            }
+        }
+
+        function animateSnowflakes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < snowflakesArray.length; i++) {
+                snowflakesArray[i].update();
+                snowflakesArray[i].draw();
+            }
+            requestAnimationFrame(animateSnowflakes);
+        }
+
+        createSnowflakes();
+        animateSnowflakes();
+    </script>
+</body>
+</html>
+
+</body>
+</html>
