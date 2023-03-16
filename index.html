@@ -102,6 +102,12 @@
         let snowflakesArray = [];
         const numberOfSnowflakes = 200;
 
+        document.addEventListener("DOMContentLoaded", function () {
+            const title = document.getElementById("title");
+            if (window.innerWidth <= 768) {
+                title.textContent = "lakehouse";
+            }
+        });
         class Snowflake {
             constructor(x, y) {
                 this.x = x;
