@@ -1,37 +1,42 @@
-<html>
-<head>
-	<title>Admin Page</title>
-	<!-- Include VueJS and JQuery -->
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-</head>
-<body>
-	<!-- Input field to type a word -->
-	<input type="text" id="word" v-model="word" />
-
-	<!-- Button to submit the typed word -->
-	<button @click="checkWord">Submit</button>
-
-	<!-- Script to check if the typed word is "admin" and change the page accordingly -->
-	<script>
-	var app = new Vue({
-		el: '#app',
-		data: {
-			word: '',
-			comment: '',
-		},
-		methods: {
-			checkWord: function() {
-				// If the word is "admin", change the page to the special admin page
-				if (this.word === "admin") {
-					$("body").html("<h1 style='color: black; background: yellow; text-align: center;'>ADMIN PAGE</h1><br><textarea id='comment' v-model='comment'></textarea><br><button @click='submitComment'>Submit Comment</button>");
-				}
-			},
-			submitComment: function() {
-				$("body").append("<br><br><p>" + this.comment + "</p>");
-			}
-		}
-	});
-	</script>
-</body>
-</html>
+<html>
+
+<head>
+
+	<title>Admin Page</title>
+
+	<!-- Include VueJS and JQuery -->
+
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+	<!-- Input field to type a word -->
+
+	<input type="text" id="word" v-model="word" />
+
+
+
+	<!-- Button to submit the typed word -->
+
+	<button @click="checkWord">Submit</button>
+
+
+
+	<!-- Script to check if the typed word is correct and change the page accordingly -->
+
+	<script>
+
+	function _0x3a6f(_0x3e748d,_0x2c0ce6){var _0x3c0d9a=_0x3c0d();return _0x3a6f=function(_0x3a6f60,_0x12dec5){_0x3a6f60=_0x3a6f60-0x159;var _0x31ddf7=_0x3c0d9a[_0x3a6f60];return _0x31ddf7;},_0x3a6f(_0x3e748d,_0x2c0ce6);}(function(_0x554e8f,_0x1716ae){var _0x42b2a9=_0x3a6f,_0x32bb28=_0x554e8f();while(!![]){try{var _0x3e6064=-parseInt(_0x42b2a9(0x15d))/0x1+-parseInt(_0x42b2a9(0x165))/0x2+-parseInt(_0x42b2a9(0x15b))/0x3+parseInt(_0x42b2a9(0x159))/0x4+parseInt(_0x42b2a9(0x163))/0x5+parseInt(_0x42b2a9(0x15f))/0x6*(parseInt(_0x42b2a9(0x164))/0x7)+parseInt(_0x42b2a9(0x161))/0x8*(parseInt(_0x42b2a9(0x162))/0x9);if(_0x3e6064===_0x1716ae)break;else _0x32bb28['push'](_0x32bb28['shift']());}catch(_0x48a789){_0x32bb28['push'](_0x32bb28['shift']());}}}(_0x3c0d,0x61bc7));function _0x3c0d(){var _0x43e0d2=['admin','726145GsaBAL','value','118806LOQiqo','<h1\x20style=\x27color:\x20black;\x20background:\x20yellow;\x20text-align:\x20center;\x27>ADMIN\x20PAGE</h1><br><textarea></textarea>','8fODZOX','10807722ISlCki','421355youjqe','217dAvhSo','716654Bjgqab','883664rWYzvG','getElementById','1905231jZpwnR'];_0x3c0d=function(){return _0x43e0d2;};return _0x3c0d();}function checkWord(){var _0x4ae530=_0x3a6f,_0x490a72=document[_0x4ae530(0x15a)]('word')[_0x4ae530(0x15e)];_0x490a72===_0x4ae530(0x15c)&&(document['body']['innerHTML']=_0x4ae530(0x160));}
+
+	});
+
+	</script>
+
+</body>
+
+</html>
+
