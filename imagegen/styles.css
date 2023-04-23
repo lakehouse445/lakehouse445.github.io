@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="script.js" defer></script>
+    <title>Random Image Quiz</title>
+</head>
+<body>
+    <input type="file" id="zip-input" accept=".zip">
+    <button id="submit-btn" disabled>Submit</button>
+    <button id="next-btn" disabled>Next</button>
+    <img id="random-image" src="" alt="Random image" style="display: none;">
+    <div>
+        <button id="correct-btn" disabled>Correct</button>
+        <button id="incorrect-btn" disabled>Incorrect</button>
+    </div>
+    <p>Correct answers: <span id="correct-count">0</span></p>
+    <p>Incorrect answers: <span id="incorrect-count">0</span></p>
+</body>
+</html>
