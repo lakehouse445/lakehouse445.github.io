@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Web Chat</title>
+    <style>
+        body {
+        background-color: black;
+        color: white;
+        font-family: monospace;
+        margin: 0;
+        padding: 0;
+        }
+        #marquee {
+        background-color: black;
+        color: white;
+        font-family: monospace;
+        padding: 1px 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        box-sizing: border-box;
+        }
+        #marquee span {
+        display: inline-block;
+        padding-left: 100%;
+        animation: marquee 15s linear infinite;
+        }
+        @keyframes marquee {
+        0% {
+        transform: translate(0, 0);
+        }
+        100% {
+        transform: translate(-100%, 0);
+        }
+        }
+        #chatlog {
+        margin: 20px;
+        font-size: 14px;
+        }
+    </style>
+    <script>
+        // Add your chat data here
+        const chatData = [
+        { "time": "20:53:40", "content": "*** Now talking in #deepwebchat ***" },
+        { "time": "20:53:40", "content": "*** Topic is 'Welcome to #deepwebchat - WE DO NOT CONDONE ILLEGAL ACTIVITY - STRICTLY FOR ANONYMOUS CHAT ONLY!' ***" },
+        { "time": "20:54:01", "content": "<anon847> hey wassup y'all" },
+        { "time": "20:54:12", "content": "<random42> nm, u?" },
+        { "time": "20:54:17", "content": "<anon847> chillin, lookin for some good shit" },
+        { "time": "20:54:27", "content": "<darknetx> u in the wrong place bro, this ain't a marketplace" },
+        { "time": "20:54:34", "content": "<anon847> nah, i know. just chattin" },
+        { "time": "20:54:45", "content": "<random42> aight, fair enough" },
+        { "time": "20:54:58", "content": "<hackerguy69> anyone got any good onion links? i'm bored af" },
+        { "time": "20:55:09", "content": "<darknetx> @hackerguy69, check out this game, it's sick" },
+        { "time": "20:55:11", "content": "<darknetx> [LINK REMOVED]" },
+        { "time": "20:55:22", "content": "<hackerguy69> thx dude, gonna check it out" },
+        { "time": "20:55:30", "content": "<anon847> yo, anyone else hear about that new bitcoin market that just opened up?" },
+        { "time": "20:55:38", "content": "<darknetx> yh, but it's probably a scam like the rest" },
+        { "time": "20:55:42", "content": "<random42> don't trust anyone, man" },
+        { "time": "20:55:52", "content": "<hackerguy69> yeah, i ain't touchin that shit. got burned too many times" },
+        { "time": "20:56:03", "content": "<anon847> fk, it's so hard to find a legit spot these days" },
+        { "time": "20:56:09", "content": "<random42> story of my life, bro" },
+        { "time": "20:56:25", "content": "<darknetx> just stick with the well-known markets, better safe than sorry" },
+        { "time": "20:56:38", "content": "<anon847> yh, guess ur right" },
+        { "time": "20:56:53", "content": "<hackerguy69> lmao, this game is crazy. nice find @darknetx" },
+        { "time": "20:57:01", "content": "<darknetx> lol, i told u man, enjoy" },
+        { "time": "20:57:13", "content": "<random42> wtf, just saw this vid on youtube that's supposed to be real footage of a ufo" },
+        { "time": "20:57:22", "content": "<anon847> lol, probs fake af" },
+        { "time": "20:57:30", "content": "<darknetx> yeah, 99% always fake" },
+        { "time": "20:57:44", "content": "<hackerguy69> if it's on youtube, it's def fake lol" },
+        { "time": "20:57:52", "content": "<random42> hahaha tru, tru" },
+        { "time": "20:58:00", "content": "<anon847> better keep lookin, then. i'm off" },
+        { "time": "20:58:10", "content": "<anon847> stay safe peeps" },
+        { "time": "20:58:15", "content": "<random42> peace out, man" },
+        { "time": "20:58:19", "content": "<darknetx> later dude" },
+        { "time": "20:58:22", "content": "<hackerguy69> cya" },
+        { "time": "20:58:25", "content": "*** anon847 has quit IRC (Quit: Leaving...) ***" },
+        { "time": "20:58:37", "content": "*** random42 is away: afk, will be back later ***" },
+        { "time": "20:58:44", "content": "<hackerguy69> so, what's everyone else up to?" },
+        { "time": "20:58:52", "content": "<darknetx> just browsin, tryna find somethin interesting" },
+        { "time": "20:59:02", "content": "<hackerguy69> same here, ain't shit goin on tonight" },
+        { "time": "20:59:08", "content": "[MESSAGE FAILURE]" },
+        { "time": "20:59:19", "content": "<hackerguy69> aight, i'm out. maybe i'll be back later" },
+        { "time": "20:59:24", "content": "<darknetx> cool, man. take care" },
+        { "time": "20:59:29", "content": "*** hackerguy69 has quit IRC (Quit: Leaving...) ***" },
+        { "time": "20:59:35", "content": "<darknetx> and then there was one..." },
+        { "time": "20:59:40", "content": "*** darknetx is away: afk, will be back later ***" }
+        ];
+        document.addEventListener("DOMContentLoaded", function() {
+        const chatlog = document.getElementById("chatlog");
+        let totalDelay = 0;
+        chatData.forEach(function(data, i) {
+        const delay = i === 0 ? 0 : getTimeDifference(chatData[i - 1].time, data.time) * 1000;
+        totalDelay += delay;
+        setTimeout(function() {
+        const message = document.createElement("div");
+        message.textContent = "[" + data.time + "] " + data.content;
+        chatlog.appendChild(message);
+        }, totalDelay);
+        });
+        });
+        function getTimeDifference(time1, time2) {
+        const t1 = time1.split(':').map(t => parseInt(t, 10));
+        const t2 = time2.split(':').map(t => parseInt(t, 10));
+        return (t2[0] * 3600 + t2[1] * 60 + t2[2]) - (t1[0] * 3600 + t1[1] * 60 + t1[2]);
+        }
+    </script>
+</head>
+
+<body>
+    <div id="marquee"><span> 'Welcome to #deepwebchat - WE DO NOT CONDONE ILLEGAL ACTIVITY - STRICTLY FOR ANONYMOUS CHAT ONLY!' ***</span></div>
+    <div id="chatlog"></div>
+</body>
+
+</html>
