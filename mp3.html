@@ -51,25 +51,21 @@
     <canvas id="visualizer"></canvas>
 
     <script>
-      // Set up the canvas for the visualizer
       const canvas = document.getElementById('visualizer');
       const ctx = canvas.getContext('2d');
       let darkMode = false;
 
-      // Set up the form for uploading MP3 files
       const form = document.getElementById('mp3-form');
       const fileInput = document.getElementById('mp3-file');
       const songSelect = document.getElementById('preselected-songs');
       const darkModeButton = document.getElementById('darkmode-btn');
 
-      // Set up the audio context and the visualizer
-      const audioCtx = new AudioContext();
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const analyser = audioCtx.createAnalyser();
 
       form.onsubmit = function(e) {
         e.preventDefault();
 
-        // Create a new audio element and set its source to the selected MP3 file
         const audio = new Audio();
         audio.crossOrigin = "anonymous";
         if (fileInput.files[0]) {
@@ -78,49 +74,42 @@
           audio.src = songSelect.value;
         }
 
-        // Set up the audio graph for the visualizer
-        const source = audioCtx.createMediaElementSource(audio);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
+        audio.addEventListener('play', () => {
+          const source = audioCtx.createMediaElementSource(audio);
+          source.connect(analyser);
+          analyser.connect(audioCtx.destination);
 
-        // Set up the canvas for the visualizer
-        function resizeCanvas() {
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Start visualizing the sound waves
-        function visualize() {
-          requestAnimationFrame(visualize);
-
-          // Get the frequency data from the audio
-          const data = new Uint8Array(analyser.frequencyBinCount);
-          analyser.getByteFrequencyData(data);
-
-          // Clear the canvas
-          ctx.fillStyle = darkMode ? '#222' : '#fff';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-          // Draw the sound waves on the canvas
-          ctx.fillStyle = darkMode ? '#ccc' : '#000';
-          const barWidth = canvas.width / data.length;
-          for (let i = 0; i < data.length; i++) {
-            const barHeight = data[i] / 2;
-            ctx.fillRect(i * barWidth, canvas.height - barHeight, barWidth, barHeight);
+          function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
           }
-        }
 
-        // Start visualizing the sound waves when the audio starts playing
-        audio.addEventListener('play', visualize);
+          window.addEventListener('resize', resizeCanvas);
+          resizeCanvas();
 
-        // Start playing the audio
+          function visualize() {
+            requestAnimationFrame(visualize);
+
+            const data = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(data);
+
+            ctx.fillStyle = darkMode ? '#222' : '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = darkMode ? '#ccc' : '#000';
+            const barWidth = canvas.width / data.length;
+            for (let i = 0; i < data.length; i++) {
+              const barHeight = data[i] / 2;
+              ctx.fillRect(i * barWidth, canvas.height - barHeight, barWidth, barHeight);
+            }
+          }
+
+          visualize();
+        });
+
         audio.play();
       }
 
-      // Toggle dark mode
       function toggleDarkMode() {
         if (darkMode) {
           darkMode = false;
