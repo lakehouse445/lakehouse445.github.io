@@ -1,110 +1,220 @@
-<html>
-  <head>
-    <title>MP3 Visualizer</title>
-  </head>
-  <body>
-    <h1>MP3 Visualizer</h1>
-
-    <p>
-      Use the form below to upload an MP3 file. You can also choose from three preselected songs. Once you have selected a file,
-      the visualizer will automatically start and you can see the sound waves
-      on the screen.
-    </p>
-
-    <form id="mp3-form">
-      <input type="file" accept="audio/mp3" id="mp3-file" />
-      <button type="submit">Upload MP3</button>
-      <select id="preselected-songs">
-        <option value="">Choose a song</option>
-        <option value="https://lakehouse.design/littledarkage.mp3">Little Dark Age</option>
-        <option value="https://lakehouse.design/caramelldansen.mp3">Caramelldansen</option>
-        <option value="https://lakehouse.design/bonobo_demo.mp3">Bonobo Demo</option>
-        <option value="https://lakehouse.design/callmewhatuwant.mp3">call me what u want</option>
-        <option value="https://lakehouse.design/oztytW7iS8Y9.128.mp3">the cure mashup</option>
-      </select>
-      <button type="button" id="darkmode-btn" onclick="toggleDarkMode()">Enable Dark Mode</button>
-    </form>
-
-    <canvas id="visualizer" width="1000" height="300"></canvas>
-
-    <script>
-      // Set up the canvas for the visualizer
-      const canvas = document.getElementById('visualizer');
-      const ctx = canvas.getContext('2d');
-      let darkMode = false;
-
-      // Set up the form for uploading MP3 files
-      const form = document.getElementById('mp3-form');
-      const fileInput = document.getElementById('mp3-file');
-      const songSelect = document.getElementById('preselected-songs');
-      const darkModeButton = document.getElementById('darkmode-btn');
-
-      // Set up the audio context and the visualizer
-      const audioCtx = new AudioContext();
-      const analyser = audioCtx.createAnalyser();
-
-      form.onsubmit = function(e) {
-        e.preventDefault();
-
-        // Create a new audio element and set its source to the selected MP3 file
-        const audio = new Audio();
-        audio.crossOrigin = "anonymous";
-        if (fileInput.files[0]) {
-          audio.src = URL.createObjectURL(fileInput.files[0]);
-        } else if (songSelect.value) {
-          audio.src = songSelect.value;
-        }
-
-        // Set up the audio graph for the visualizer
-        const source = audioCtx.createMediaElementSource(audio);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-
-                // Set up the canvas for the visualizer
-        const width = canvas.width;
-        const height = canvas.height;
-
-        // Start visualizing the sound waves
-        function visualize() {
-          requestAnimationFrame(visualize);
-
-          // Get the frequency data from the audio
-          const data = new Uint8Array(analyser.frequencyBinCount);
-          analyser.getByteFrequencyData(data);
-
-          // Clear the canvas
-          ctx.fillStyle = darkMode ? '#222' : '#fff';
-          ctx.fillRect(0, 0, width, height);
-
-          // Draw the sound waves on the canvas
-          ctx.fillStyle = darkMode ? '#ccc' : '#000';
-          for (let i = 0; i < data.length; i++) {
-            const barHeight = data[i] / 2;
-            ctx.fillRect(i * 2, height - barHeight, 1, barHeight);
-          }
-        }
-
-        // Start visualizing the sound waves when the audio starts playing
-        audio.addEventListener('play', visualize);
-
-        // Start playing the audio
-        audio.play();
-      }
-
-      // Toggle dark mode
-      function toggleDarkMode() {
-        if (darkMode) {
-          darkMode = false;
-          darkModeButton.innerHTML = 'Enable Dark Mode';
-          document.body.style.background = '#fff';
-          document.body.style.color = '#000';
-        } else {
-          darkMode = true;
-          darkModeButton.innerHTML = 'Disable Dark Mode';
-          document.body.style.background = '#222';
-          document.body.style.color = '#ccc';
-        }
-      }
-    </script>
-  </body>
-</html>
+<html>
+
+  <head>
+
+    <title>MP3 Visualizer</title>
+
+  </head>
+
+  <body>
+
+    <h1>MP3 Visualizer</h1>
+
+
+
+    <p>
+
+      Use the form below to upload an MP3 file. You can also choose from three preselected songs. Once you have selected a file,
+
+      the visualizer will automatically start and you can see the sound waves
+
+      on the screen.
+
+    </p>
+
+
+
+    <form id="mp3-form">
+
+      <input type="file" accept="audio/mp3" id="mp3-file" />
+
+      <button type="submit">Upload MP3</button>
+
+      <select id="preselected-songs">
+
+        <option value="">Choose a song</option>
+
+        <option value="https://lakehouse.ink/littledarkage.mp3">Little Dark Age</option>
+
+        <option value="https://lakehouse.ink/caramelldansen.mp3">Caramelldansen</option>
+
+        <option value="https://lakehouse.ink/bonobo_demo.mp3">Bonobo Demo</option>
+
+        <option value="https://lakehouse.ink/callmewhatuwant.mp3">call me what u want</option>
+
+        <option value="https://lakehouse.ink/oztytW7iS8Y9.128.mp3">the cure mashup</option>
+
+      </select>
+
+      <button type="button" id="darkmode-btn" onclick="toggleDarkMode()">Enable Dark Mode</button>
+
+    </form>
+
+
+
+    <canvas id="visualizer" width="1000" height="300"></canvas>
+
+
+
+    <script>
+
+      // Set up the canvas for the visualizer
+
+      const canvas = document.getElementById('visualizer');
+
+      const ctx = canvas.getContext('2d');
+
+      let darkMode = false;
+
+
+
+      // Set up the form for uploading MP3 files
+
+      const form = document.getElementById('mp3-form');
+
+      const fileInput = document.getElementById('mp3-file');
+
+      const songSelect = document.getElementById('preselected-songs');
+
+      const darkModeButton = document.getElementById('darkmode-btn');
+
+
+
+      // Set up the audio context and the visualizer
+
+      const audioCtx = new AudioContext();
+
+      const analyser = audioCtx.createAnalyser();
+
+
+
+      form.onsubmit = function(e) {
+
+        e.preventDefault();
+
+
+
+        // Create a new audio element and set its source to the selected MP3 file
+
+        const audio = new Audio();
+
+        audio.crossOrigin = "anonymous";
+
+        if (fileInput.files[0]) {
+
+          audio.src = URL.createObjectURL(fileInput.files[0]);
+
+        } else if (songSelect.value) {
+
+          audio.src = songSelect.value;
+
+        }
+
+
+
+        // Set up the audio graph for the visualizer
+
+        const source = audioCtx.createMediaElementSource(audio);
+
+        source.connect(analyser);
+
+        analyser.connect(audioCtx.destination);
+
+
+
+                // Set up the canvas for the visualizer
+
+        const width = canvas.width;
+
+        const height = canvas.height;
+
+
+
+        // Start visualizing the sound waves
+
+        function visualize() {
+
+          requestAnimationFrame(visualize);
+
+
+
+          // Get the frequency data from the audio
+
+          const data = new Uint8Array(analyser.frequencyBinCount);
+
+          analyser.getByteFrequencyData(data);
+
+
+
+          // Clear the canvas
+
+          ctx.fillStyle = darkMode ? '#222' : '#fff';
+
+          ctx.fillRect(0, 0, width, height);
+
+
+
+          // Draw the sound waves on the canvas
+
+          ctx.fillStyle = darkMode ? '#ccc' : '#000';
+
+          for (let i = 0; i < data.length; i++) {
+
+            const barHeight = data[i] / 2;
+
+            ctx.fillRect(i * 2, height - barHeight, 1, barHeight);
+
+          }
+
+        }
+
+
+
+        // Start visualizing the sound waves when the audio starts playing
+
+        audio.addEventListener('play', visualize);
+
+
+
+        // Start playing the audio
+
+        audio.play();
+
+      }
+
+
+
+      // Toggle dark mode
+
+      function toggleDarkMode() {
+
+        if (darkMode) {
+
+          darkMode = false;
+
+          darkModeButton.innerHTML = 'Enable Dark Mode';
+
+          document.body.style.background = '#fff';
+
+          document.body.style.color = '#000';
+
+        } else {
+
+          darkMode = true;
+
+          darkModeButton.innerHTML = 'Disable Dark Mode';
+
+          document.body.style.background = '#222';
+
+          document.body.style.color = '#ccc';
+
+        }
+
+      }
+
+    </script>
+
+  </body>
+
+</html>
+
