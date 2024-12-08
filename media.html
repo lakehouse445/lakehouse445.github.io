@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            background-color: #00274d;
+            color: white;
+            padding: 10px 20px;
+        }
+        .badge {
+            width: 80px;
+            height: 80px;
+            margin-right: 20px;
+        }
+        marquee {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        nav {
+            background-color: #004080;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        nav ul {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        nav ul li {
+            margin: 0;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        nav ul li a:hover {
+            background-color: #00274d;
+        }
+        .media-gallery {
+            max-width: 900px;
+            margin: 50px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        .media-gallery img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .media-gallery img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #00274d;
+            color: white;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://lakehouse.ink/badge%20(2).png" alt="Badge" class="badge">
+        <marquee behavior="scroll" direction="left" scrollamount="6">
+            Welcome to Harrison's Homigrad! Moderation in Action. Keep it clean, keep it cool.
+        </marquee>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="intros.html">Intros</a></li>
+            <li><a href="media.html">Media</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+    <div class="media-gallery">
+        <!-- Images with download links -->
+        <a href="https://lakehouse.ink/5441AA2E-1B0D-46A6-BFB3-34CA284FC121.webp" download>
+            <img src="https://lakehouse.ink/5441AA2E-1B0D-46A6-BFB3-34CA284FC121.webp" alt="Image 1">
+        </a>
+        <a href="https://lakehouse.ink/DAC76389-8393-46E0-82EC-653B13B31AA7.png" download>
+            <img src="https://lakehouse.ink/DAC76389-8393-46E0-82EC-653B13B31AA7.png" alt="Image 2">
+        </a>
+        <a href="https://lakehouse.ink/badge_archibald.png" download>
+            <img src="https://lakehouse.ink/badge_archibald.png" alt="Archibald Badge">
+        </a>
+        <a href="https://lakehouse.ink/badge_muse_bad.png" download>
+            <img src="https://lakehouse.ink/badge_muse_bad.png" alt="Muse Badge Bad">
+        </a>
+        <a href="https://lakehouse.ink/badge_lakehouse.png" download>
+            <img src="https://lakehouse.ink/badge_lakehouse.png" alt="Lakehouse Badge">
+        </a>
+        <a href="https://lakehouse.ink/badge_nancy.png" download>
+            <img src="https://lakehouse.ink/badge_nancy.png" alt="Nancy Badge">
+        </a>
+        <a href="https://lakehouse.ink/badge_muse.png" download>
+            <img src="https://lakehouse.ink/badge_muse.png" alt="Muse Badge">
+        </a>
+    </div>
+    <div class="footer">
+        <p>Copyright © 2024 Lakehouse & Friends</p>
+    </div>
+</body>
+</html>
