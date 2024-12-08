@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harrison's Homigrad Police Department</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            background-color: #00274d;
+            color: white;
+            padding: 10px 20px;
+        }
+        .badge {
+            width: 80px;
+            height: 80px;
+            margin-right: 20px;
+        }
+        marquee {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        nav {
+            background-color: #004080;
+            padding: 10px 0;
+        }
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        .hero {
+            text-align: center;
+            padding: 50px 20px;
+            background-color: #eaf3ff;
+        }
+        .hero h1 {
+            color: #00274d;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 18px;
+            color: #555;
+        }
+        .hero button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #004080;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .hero button:hover {
+            background-color: #00274d;
+        }
+        #employment-text {
+            display: none;
+            margin-top: 15px;
+            font-size: 16px;
+            color: #004080;
+            text-align: center;
+            animation: fadeIn 1s ease-in;
+        }
+        .duties {
+            max-width: 800px;
+            margin: 50px auto;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease-in forwards;
+        }
+        .duties h2 {
+            color: #00274d;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        .duties ul {
+            list-style: none;
+            padding: 0;
+            font-size: 18px;
+            color: #555;
+        }
+        .duties ul li {
+            margin-bottom: 15px;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #00274d;
+            color: white;
+            margin-top: 50px;
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://lakehouse.ink/badge%20(2).png" alt="Badge" class="badge">
+        <marquee behavior="scroll" direction="left" scrollamount="6">
+            Welcome to Harrison's Homigrad! Moderation in Action. Keep it clean, keep it cool.
+        </marquee>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#intros">Intros</a></li>
+            <li><a href="#media">Media</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+    <div class="hero">
+        <h1>Welcome to Harrison's Homigrad</h1>
+        <p>Your trusted digital patrol, ensuring harmony and hilarity in the community.</p>
+        <button onclick="showEmploymentText()">Join the Deputies</button>
+        <div id="employment-text">
+            Please contact <strong>@lakehousee</strong> on Discord for interviewing and potential employment as a full-time Moderator's Deputy.
+        </div>
+    </div>
+    <div class="duties">
+        <h2>Our Duties</h2>
+        <ul>
+            <li>Monitoring meme traffic flow to ensure no illegal duplication occurs.</li>
+            <li>Conducting thorough audits on profile pictures for alignment with current aesthetic standards.</li>
+            <li>Ensuring digital files adhere to a strict 12-point naming convention.</li>
+            <li>Reviewing all posts flagged for subjective irrelevance by at least three users within a 90-second window.</li>
+            <li>Maintaining a comprehensive database of "unofficial" emojis for compliance with cross-platform standards.</li>
+            <li>Implementing situational awareness protocols for content that exceeds expected engagement benchmarks.</li>
+        </ul>
+    </div>
+    <div class="footer">
+        <p>Copyright © 2024 Lakehouse & Friends</p>
+    </div>
+    <script>
+        function showEmploymentText() {
+            const text = document.getElementById('employment-text');
+            text.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
