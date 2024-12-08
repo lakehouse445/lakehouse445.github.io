@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            background-color: #00274d;
+            color: white;
+            padding: 10px 20px;
+        }
+        .badge {
+            width: auto;
+            height: auto;
+            margin-right: 20px;
+        }
+        marquee {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        nav {
+            background-color: #004080;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        nav ul {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        nav ul li {
+            margin: 0;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        nav ul li a:hover {
+            background-color: #00274d;
+        }
+        .contacts {
+            max-width: 900px;
+            margin: 50px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .contact-card {
+            text-align: center;
+            position: relative;
+        }
+        .contact-card img {
+            width: auto;
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .contact-card img:hover {
+            transform: scale(1.1);
+        }
+        .contact-info {
+            display: none;
+            position: relative;
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation-duration: 0.3s;
+        }
+        .contact-info.show {
+            display: block;
+            animation: slideOut 0.3s ease forwards;
+        }
+        @keyframes slideOut {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(10px);
+            }
+        }
+        .contact-info a {
+            color: #00c8ff;
+            text-decoration: none;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #00274d;
+            color: white;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://lakehouse.ink/badge%20(2).png" alt="Badge" class="badge">
+        <marquee behavior="scroll" direction="left" scrollamount="6">
+            Welcome to Harrison's Homigrad! Moderation in Action. Keep it clean, keep it cool.
+        </marquee>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="intros.html">Intros</a></li>
+            <li><a href="media.html">Media</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+    <div class="contacts">
+        <!-- Muse Contact -->
+        <div class="contact-card">
+            <img src="https://lakehouse.ink/badge_muse.png" alt="Muse Badge" onclick="toggleInfo('muse-info')">
+            <div id="muse-info" class="contact-info">
+                <p><strong>Discord:</strong> agelessmuse</p>
+                <p><strong>Steam:</strong> <a href="https://steamcommunity.com/profiles/76561197980448331" target="_blank">agelessmuse</a></p>
+            </div>
+        </div>
+        <!-- Lakehouse Contact -->
+        <div class="contact-card">
+            <img src="https://lakehouse.ink/badge_lakehouse.png" alt="Lakehouse Badge" onclick="toggleInfo('lakehouse-info')">
+            <div id="lakehouse-info" class="contact-info">
+                <p><strong>Discord:</strong> lakehousee</p>
+                <p><strong>Steam:</strong> <a href="https://steamcommunity.com/id/lakehousee/" target="_blank">lakehouse</a></p>
+            </div>
+        </div>
+        <!-- Nancy Contact -->
+        <div class="contact-card">
+            <img src="https://lakehouse.ink/badge_nancy.png" alt="Nancy Badge" onclick="toggleInfo('nancy-info')">
+            <div id="nancy-info" class="contact-info">
+                <p><strong>Discord:</strong> superbacker</p>
+                <p><strong>Steam:</strong> <a href="https://steamcommunity.com/profiles/76561199200483657" target="_blank">resonance</a></p>
+            </div>
+        </div>
+        <!-- Archibald Contact -->
+        <div class="contact-card">
+            <img src="https://lakehouse.ink/badge_archibald.png" alt="Archibald Badge" onclick="toggleInfo('archibald-info')">
+            <div id="archibald-info" class="contact-info">
+                <p><strong>Discord:</strong> ninkakissen</p>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>Copyright © 2024 Lakehouse & Friends</p>
+    </div>
+    <script>
+        function toggleInfo(infoId) {
+            const info = document.getElementById(infoId);
+            if (info.classList.contains('show')) {
+                info.classList.remove('show');
+            } else {
+                document.querySelectorAll('.contact-info').forEach((el) => el.classList.remove('show'));
+                info.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>
