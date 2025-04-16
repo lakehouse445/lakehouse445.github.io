@@ -404,6 +404,7 @@
         const username = usernameInput.value.trim();
         if (username) {
             playSound();
+            // Correct localStorage setItem call
             localStorage.setItem("username", username);
             usernameInput.value = '';
             document.getElementById("username-container").innerHTML = '<div id="spinner"></div>';
@@ -421,6 +422,8 @@
     function handleConfirmationChange() {
         confirmationOverlay.style.display = 'none';
         usernameOverlay.style.display = 'flex';
+        // Clear existing username when changing
+        localStorage.removeItem("username");
     }
 
     // Event Listeners
@@ -434,8 +437,13 @@
     // Initialization
     window.addEventListener("load", () => {
         new MatrixBackground();
+        // Correct localStorage getItem call
         const storedUsername = localStorage.getItem("username");
-        storedUsername ? showConfirmation(storedUsername) : usernameOverlay.style.display = 'flex';
+        if (storedUsername) {
+            showConfirmation(storedUsername);
+        } else {
+            usernameOverlay.style.display = 'flex';
+        }
     });
 </script>
 </body>
