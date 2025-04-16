@@ -262,123 +262,181 @@
 
     <audio id="submit-sound" src="https://assets.onecompiler.app/436kcxhsw/43ezp8v3b/745925__projecteur__vaporwave-theme-vhs-distorted.mp3"></audio>
 
-    <script>
-        const usernameOverlay = document.getElementById("username-overlay");
-        const usernameInput = document.getElementById("username-input");
-        const submitUsernameButton = document.getElementById("submit-username");
-        const chatWindow = document.getElementById("chat-window");
-        const audioElement = document.getElementById('submit-sound');
-        const confirmationOverlay = document.getElementById('confirmation-overlay');
-        const displayUsername = document.getElementById('display-username');
-        const confirmYesBtn = document.getElementById('confirm-yes');
-        const confirmChangeBtn = document.getElementById('confirm-change');
-        
-        let queueCounter = null;
-        audioElement.volume = 0.5;
+<script>
+    // DOM Elements
+    const usernameOverlay = document.getElementById("username-overlay");
+    const usernameInput = document.getElementById("username-input");
+    const submitUsernameButton = document.getElementById("submit-username");
+    const chatWindow = document.getElementById("chat-window");
+    const audioElement = document.getElementById('submit-sound');
+    const confirmationOverlay = document.getElementById('confirmation-overlay');
+    const displayUsername = document.getElementById('display-username');
+    const confirmYesBtn = document.getElementById('confirm-yes');
+    const confirmChangeBtn = document.getElementById('confirm-change');
 
-        function playSound() {
-            audioElement.play().catch(error => {
-                console.log('Audio playback failed:', error);
-                audioElement.muted = true;
-                audioElement.play();
+    // Matrix Background Class
+    class MatrixBackground {
+        constructor() {
+            this.container = document.getElementById('matrixBackground');
+            this.layers = [];
+            this.speed = 0.5;
+            this.layerCount = 3;
+            this.layerHeight = window.innerHeight;
+            
+            this.init();
+            this.startAnimation();
+            window.addEventListener('resize', this.handleResize.bind(this));
+        }
+
+        init() {
+            this.container.style.height = `${this.layerHeight * this.layerCount}px`;
+            for(let i = 0; i < this.layerCount; i++) {
+                const layer = document.createElement('div');
+                layer.className = 'matrix-layer';
+                layer.style.transform = `translateY(${-this.layerHeight * i}px)`;
+                this.container.appendChild(layer);
+                this.layers.push({
+                    element: layer,
+                    position: -this.layerHeight * i
+                });
+            }
+        }
+
+        handleResize() {
+            this.layerHeight = window.innerHeight;
+            this.container.style.height = `${this.layerHeight * this.layerCount}px`;
+            this.layers.forEach((layer, index) => {
+                layer.position = -this.layerHeight * index;
+                layer.element.style.transform = `translateY(${layer.position}px)`;
             });
         }
 
-        function addMessage(text, delay = 0) {
-            setTimeout(() => {
-                const messageElem = document.createElement("div");
-                messageElem.className = "chat-message";
-                messageElem.textContent = text;
-                chatWindow.appendChild(messageElem);
-                chatWindow.scrollTop = chatWindow.scrollHeight;
-            }, delay);
-        }
-
-        function createQueueCounter() {
-            let base = 16128;
-            let current = base;
-            let phase = 'down';
-            let counter = 0;
-            
-            return function() {
-                if (phase === 'down') {
-                    current -= Math.floor(Math.random() * 3) + 1;
-                    counter++;
-                    if (counter > 2) {
-                        phase = 'up';
-                        counter = 0;
-                    }
-                } else {
-                    current += Math.floor(Math.random() * 5) + 3;
-                    counter++;
-                    if (counter > 3) {
-                        phase = 'down';
-                        counter = 0;
-                    }
+        updateLayers() {
+            this.layers.forEach(layer => {
+                layer.position += this.speed;
+                if(layer.position > 0) {
+                    layer.position = -this.layerHeight * (this.layerCount - 1);
                 }
-                return current;
+                layer.element.style.transform = `translateY(${layer.position}px)`;
+            });
+        }
+
+        startAnimation() {
+            const animate = () => {
+                this.updateLayers();
+                requestAnimationFrame(animate);
             };
+            animate();
         }
+    }
 
-        function startAutoMessages() {
-            addMessage("Lakehouse is currently chatting with someone.", 500);
-            addMessage("Please Wait", 1500);
-            
-            setTimeout(() => {
-                const queueElem = document.createElement("div");
-                queueElem.className = "chat-message";
-                queueElem.style.opacity = "1";
-                chatWindow.appendChild(queueElem);
-                
-                queueCounter = createQueueCounter();
-                setInterval(() => {
-                    queueElem.textContent = `You are: ${queueCounter()}th in queue.`;
-                }, 1000);
-            }, 2500);
-        }
+    // Application State
+    let queueCounter = null;
+    audioElement.volume = 0.5;
 
-        function showConfirmation(username) {
-            displayUsername.textContent = username;
-            confirmationOverlay.style.display = 'flex';
-        }
-
-        // Event Listeners
-        submitUsernameButton.addEventListener("click", () => {
-            const username = usernameInput.value.trim();
-            if (username) {
-                playSound();
-                localStorage.setItem("username", username);
-                usernameInput.value = '';
-                document.getElementById("username-container").innerHTML = '<div id="spinner"></div>';
-                setTimeout(() => window.location.reload(), 1500);
-            }
+    // Core Functions
+    function playSound() {
+        audioElement.play().catch(error => {
+            console.log('Audio playback failed:', error);
+            audioElement.muted = true;
+            audioElement.play();
         });
+    }
 
-        confirmYesBtn.addEventListener('click', () => {
-            playSound();
-            confirmationOverlay.style.display = 'none';
-            usernameOverlay.style.display = 'none';
-            startAutoMessages();
-        });
+    function addMessage(text, delay = 0) {
+        setTimeout(() => {
+            const messageElem = document.createElement("div");
+            messageElem.className = "chat-message";
+            messageElem.textContent = text;
+            chatWindow.appendChild(messageElem);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }, delay);
+    }
 
-        confirmChangeBtn.addEventListener('click', () => {
-            confirmationOverlay.style.display = 'none';
-            usernameOverlay.style.display = 'flex';
-        });
-
-        usernameInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") submitUsernameButton.click();
-        });
-
-        // Initial Load
-        window.addEventListener("load", () => {
-            const storedUsername = localStorage.getItem("username");
-            if (storedUsername) {
-                showConfirmation(storedUsername);
+    function createQueueCounter() {
+        let base = 16128;
+        let current = base;
+        let phase = 'down';
+        let counter = 0;
+        
+        return function() {
+            if (phase === 'down') {
+                current -= Math.floor(Math.random() * 3) + 1;
+                if (++counter > 2) {
+                    phase = 'up';
+                    counter = 0;
+                }
             } else {
-                usernameOverlay.style.display = 'flex';
+                current += Math.floor(Math.random() * 5) + 3;
+                if (++counter > 3) {
+                    phase = 'down';
+                    counter = 0;
+                }
             }
-        });
-    </script>
+            return current;
+        };
+    }
+
+    function startAutoMessages() {
+        addMessage("Lakehouse is currently chatting with someone.", 500);
+        addMessage("Please Wait", 1500);
+        
+        setTimeout(() => {
+            const queueElem = document.createElement("div");
+            queueElem.className = "chat-message";
+            queueElem.style.opacity = "1";
+            chatWindow.appendChild(queueElem);
+            
+            queueCounter = createQueueCounter();
+            setInterval(() => {
+                queueElem.textContent = `You are currently ${queueCounter()} in queue.`;
+            }, 1000);
+        }, 2500);
+    }
+
+    function showConfirmation(username) {
+        displayUsername.textContent = username;
+        confirmationOverlay.style.display = 'flex';
+    }
+
+    // Event Handlers
+    function handleSubmit() {
+        const username = usernameInput.value.trim();
+        if (username) {
+            playSound();
+            localStorage.setItem("username", username);
+            usernameInput.value = '';
+            document.getElementById("username-container").innerHTML = '<div id="spinner"></div>';
+            setTimeout(() => window.location.reload(), 1500);
+        }
+    }
+
+    function handleConfirmationYes() {
+        playSound();
+        confirmationOverlay.style.display = 'none';
+        usernameOverlay.style.display = 'none';
+        startAutoMessages();
+    }
+
+    function handleConfirmationChange() {
+        confirmationOverlay.style.display = 'none';
+        usernameOverlay.style.display = 'flex';
+    }
+
+    // Event Listeners
+    submitUsernameButton.addEventListener("click", handleSubmit);
+    confirmYesBtn.addEventListener('click', handleConfirmationYes);
+    confirmChangeBtn.addEventListener('click', handleConfirmationChange);
+    usernameInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") handleSubmit();
+    });
+
+    // Initialization
+    window.addEventListener("load", () => {
+        new MatrixBackground();
+        const storedUsername = localStorage.getItem("username");
+        storedUsername ? showConfirmation(storedUsername) : usernameOverlay.style.display = 'flex';
+    });
+</script>
 </body>
 </html>
