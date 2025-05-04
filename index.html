@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lakehouse.ink</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Open+Sans&display=swap" rel="stylesheet">
+    <style>
+        /* --- Base Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Hide potential overflow from effects */
+            position: relative;
+            transition: background-color 0.5s, color 0.5s; /* Smooth transition */
+            background-color: black; /* Default background */
+        }
+
+        .content-wrapper {
+             position: relative;
+             z-index: 2; /* Above background effects */
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: center;
+             width: 90%;
+             max-width: 800px;
+             padding: 20px;
+             text-align: center; /* Ensure content inside is centered */
+        }
+
+         ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-bottom: 20px; /* Space before switcher */
+        }
+
+        li {
+            margin: 5px 15px;
+        }
+
+        a {
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .bottom-left-link,
+        .bottom-right-link {
+            position: fixed;
+            bottom: 20px;
+            z-index: 10; /* Above most content, below CRT effect */
+        }
+        .bottom-left-link { left: 20px; }
+        .bottom-right-link { right: 20px; }
+
+        /* --- Secret Link --- */
+        #secret-chat-link {
+            display: none; /* Hidden by default */
+            position: fixed;
+            bottom: 45px; /* Position above the bottom-right link */
+            right: 20px;
+            z-index: 10;
+            opacity: 0.6; /* Make it less obvious initially */
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- Theme Switcher Button --- */
+        #theme-switcher {
+            margin-top: 20px; /* Space after links */
+            width: 60px; /* Wider rectangle */
+            height: 35px; /* Button height */
+            cursor: pointer;
+            border: 2px solid; /* Base border, color/style set by theme */
+            background-color: black; /* Default background */
+            transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s; /* Smooth transitions */
+            z-index: 5; /* Ensure it's clickable */
+            position: relative; /* Needed for positioning the inner canvas */
+            opacity: 0.8; /* Slightly transparent normally */
+            overflow: hidden; /* IMPORTANT: Clip background animations AND inner canvas */
+            border-radius: 3px; /* Slightly rounded rectangle */
+            color: transparent; /* Hide any accidental text */
+        }
+        #theme-switcher:hover {
+            opacity: 1.0; /* Fully opaque on hover */
+        }
+
+        /* Style for the preview canvas inside the button */
+        #theme-switcher-snow-preview {
+            position: absolute; /* Position relative to button */
+            top: 0;
+            left: 0;
+            width: 100%; /* Fill the button */
+            height: 100%;
+            display: none; /* Hidden by default */
+            pointer-events: none; /* Make sure it doesn't block clicks */
+            z-index: 1; /* Behind potential future button content, but visible */
+        }
+
+
+        /* --- Snowflake Theme Styles --- */
+        .theme-snow {
+            /* background-color: black; Done on body */
+            color: white;
+            font-family: 'Open Sans', sans-serif;
+        }
+        .theme-snow h1 {
+            font-family: 'Lato', sans-serif;
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
+        }
+         .theme-snow a { /* General links in snow theme */
+            color: white;
+            font-size: 18px;
+        }
+         .theme-snow a:not(#secret-chat-link):hover { /* Exclude secret link from underline */
+            text-decoration: underline;
+        }
+        /* Show Main Snow Canvas in Snow theme */
+        .theme-snow canvas#snowCanvas {
+            display: block; /* Show canvas */
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1; /* Behind content wrapper (z-index: 2), above body bg */
+        }
+        /* Hide Matrix elements, Button Preview Canvas, and Secret Link in Snow theme */
+        .theme-snow .matrix-bg,
+        .theme-snow .crt-effect,
+        .theme-snow #theme-switcher-snow-preview,
+        .theme-snow #secret-chat-link { /* Ensure secret link is hidden */
+            display: none;
+        }
+        /* Style switcher button AS RETRO PREVIEW when snow theme is active */
+        .theme-snow #theme-switcher {
+             border-color: #00FF00; /* Green border */
+             box-shadow: 0 0 3px rgba(0, 255, 0, 0.8),
+                         0 0 6px rgba(0, 255, 0, 0.6),
+                         inset 0 0 4px rgba(0, 255, 0, 0.5); /* Green glow */
+             /* Apply animated matrix background DIRECTLY to the button */
+             background-image: radial-gradient(#00FF00 0.6px, black 0.6px); /* Tiny dots */
+             background-size: 7px 7px; /* Dense dots */
+             animation: button-matrix-scroll 3s linear infinite; /* Apply specific animation */
+        }
+
+
+        /* --- Retro Theme Styles --- */
+        .theme-retro {
+            /* background-color: black; Done on body */
+            color: #00FF00;
+            font-family: "Courier New", Courier, monospace;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+        .theme-retro h1 {
+            font-size: 48px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            /* Inherits text-shadow */
+        }
+        .theme-retro a { /* General links in retro theme */
+            color: #00FF00;
+            font-size: 16px;
+             /* Inherits text-shadow */
+        }
+        .theme-retro a:hover {
+            color: #8aff8a;
+            text-shadow: 0 0 10px #00FF00, 0 0 5px #8aff8a;
+        }
+        /* Hide Main Snow Canvas in Retro theme */
+        .theme-retro canvas#snowCanvas {
+            display: none;
+        }
+        /* Show Matrix elements in Retro theme */
+        .theme-retro .matrix-bg,
+        .theme-retro .crt-effect {
+            display: block;
+        }
+        /* Show Secret Link in Retro theme */
+        .theme-retro #secret-chat-link {
+            display: inline; /* Or block, depending on desired layout */
+            font-family: "Courier New", Courier, monospace; /* Match theme font */
+            font-size: 10px; /* Make it small */
+            color: #00FF00; /* Match theme color */
+            text-decoration: none; /* No underline */
+            text-shadow: 0 0 3px rgba(0, 255, 0, 0.4); /* Subtle glow */
+        }
+        .theme-retro #secret-chat-link:hover {
+            opacity: 1.0; /* Become fully visible on hover */
+            text-shadow: 0 0 8px #00FF00, 0 0 4px #8aff8a; /* Brighter glow */
+        }
+         /* Style switcher button AS SNOW PREVIEW when retro theme is active */
+        .theme-retro #theme-switcher {
+             border-color: white; /* White border */
+             box-shadow: 0 0 3px rgba(255, 255, 255, 0.7),
+                         0 0 6px rgba(255, 255, 255, 0.5),
+                         inset 0 0 4px rgba(255, 255, 255, 0.3); /* Frosty glow */
+             /* Reset button background properties to allow canvas to show */
+             background-image: none;
+             background-color: black; /* Keep black background behind canvas */
+             animation: none; /* Ensure no CSS animation runs */
+             background-position: 0 0; /* Reset position */
+        }
+        /* Show preview canvas when retro theme is active */
+        .theme-retro #theme-switcher #theme-switcher-snow-preview {
+            display: block;
+        }
+
+        /* --- Background Effects --- */
+
+        /* Matrix Background Styles (Only active in .theme-retro) */
+        .matrix-bg {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100vh;
+            background: black; overflow: hidden; z-index: -2; /* Behind potential canvas */
+            background-image: radial-gradient(#00FF00 1px, transparent 1px);
+            background-size: 20px 20px; opacity: 0.1;
+            animation: matrix-scroll 20s linear infinite;
+        }
+        @keyframes matrix-scroll {
+            from { background-position-y: 0px; }
+            to { background-position-y: -400px; }
+        }
+
+        /* CRT Effect Styles (Only active in .theme-retro) */
+        .crt-effect {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 999; /* On top */
+            overflow: hidden;
+        }
+        .crt-effect::before { /* Scanlines */
+            content: ""; position: absolute; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+            animation: scanline 6s linear infinite;
+             background-position: 0 0;
+        }
+        .crt-effect::after { /* Vignette/Glow */
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 15px; /* Optional screen curve */
+            box-shadow: inset 0 0 30px rgba(0,255,0,0.2), inset 0 0 15px rgba(0,255,0,0.4), 0 0 50px rgba(0,255,0,0.1);
+            border: 2px solid rgba(0,255,0,0.1);
+        }
+        @keyframes scanline {
+             0% { background-position: 0 0; }
+             100% { background-position: 0 100%; }
+        }
+
+        /* Keyframes for the button's mini matrix scroll */
+        @keyframes button-matrix-scroll {
+            from { background-position-y: 0px; }
+            to { background-position-y: -100px; } /* Adjust distance for speed */
+        }
+
+
+        /* --- Media queries --- */
+        @media (max-width: 768px) {
+             /* Base adjustments */
+             ul { justify-content: center; }
+             li { margin: 8px 10px; }
+             a { font-size: 14px; }
+             .bottom-left-link, .bottom-right-link { font-size: 12px; bottom: 10px; }
+             .bottom-left-link { left: 10px; }
+             .bottom-right-link { right: 10px; }
+             #secret-chat-link { bottom: 30px; right: 10px; font-size: 9px; } /* Adjust secret link position/size */
+
+
+             /* Switcher adjustments */
+             #theme-switcher {
+                 width: 50px; /* Adjust size for mobile */
+                 height: 30px;
+             }
+             .theme-snow #theme-switcher { /* Retro preview on mobile */
+                 background-size: 6px 6px;
+             }
+
+            /* Snowflake specific adjustments */
+            .theme-snow h1 { font-size: 48px; }
+            .theme-snow a { font-size: 16px; }
+
+            /* Retro specific adjustments */
+            .theme-retro h1 { font-size: 36px; }
+            .theme-retro a { font-size: 14px; }
+        }
+    </style>
+</head>
+<body > <div class="matrix-bg"></div>
+    <div class="crt-effect"></div>
+    <canvas id="snowCanvas"></canvas> <div class="content-wrapper">
+        <h1 id="title">lakehouse.ink</h1>
+        <ul>
+            <li><a href="https://steamcommunity.com/id/honeyiyeetedthekids/" target="_blank">Steam</a></li>
+            <li><a href="https://open.spotify.com/user/nmrop8ickrlc2fv4ve83ku93v?si=4d64cd61ab0e420e" target="_blank">Spotify</a></li>
+            <li><a href="https://discord.gg/hubPMZZY9H" target="_blank">Discord</a></li>
+            <li><a href="https://tracker.gg/valorant/profile/riot/chaos%2312312/overview" target="_blank">Valorant</a></li>
+        </ul>
+        <button id="theme-switcher" aria-label="Switch Theme">
+             <canvas id="theme-switcher-snow-preview"></canvas> </button>
+    </div>
+
+    <a class="bottom-left-link" href="https://lakehouse.ink/old" target="_blank">Old Index</a>
+    <a class="bottom-right-link" href="https://lakehouse.ink/minecraft" target="_blank">Minecraft Server</a>
+    <a id="secret-chat-link" href="https://lakehouse.ink/chat" target="_blank">Chat</a>
+
+
+    <script>
+        // --- DOM Element References ---
+        const themeSwitcher = document.getElementById('theme-switcher');
+        const body = document.body;
+        const title = document.getElementById("title");
+        const mainCanvas = document.getElementById('snowCanvas');
+        const mainCtx = mainCanvas ? mainCanvas.getContext('2d') : null;
+        const buttonCanvas = document.getElementById('theme-switcher-snow-preview');
+        const buttonCtx = buttonCanvas ? buttonCanvas.getContext('2d') : null;
+
+        // --- Snowflake Animation Variables ---
+        // Main Canvas (Using Original Logic)
+        let mainSnowflakesArray = [];
+        const numberOfMainSnowflakes = 200;
+        let mainSnowAnimationId = null; // requestAnimationFrame ID for main loop
+
+        // Button Canvas (Preview Logic)
+        let buttonSnowflakesArray = [];
+        const numberOfButtonSnowflakes = 15;
+        let buttonSnowAnimationId = null; // requestAnimationFrame ID for button loop
+
+        // --- Snowflake Classes ---
+        // Class for MAIN background snowflakes (adapted from original)
+        class MainSnowflake {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 5 + 1; // Original size
+                this.speedY = Math.random() * 1 + 0.5; // Original speed
+            }
+            update() {
+                if (!mainCanvas) return;
+                // Use physical height/width for boundary checks as coordinates aren't scaled
+                this.y += this.speedY;
+                if (this.y > mainCanvas.height / (window.devicePixelRatio || 1)) { // Check against logical height
+                    this.y = 0 - this.size;
+                    this.x = Math.random() * mainCanvas.width / (window.devicePixelRatio || 1); // Check against logical width
+                }
+            }
+            draw() {
+                if (!mainCtx) return;
+                mainCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                mainCtx.beginPath();
+                // Draw using logical coordinates
+                mainCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                mainCtx.closePath();
+                mainCtx.fill();
+            }
+        }
+
+        // Class for BUTTON preview snowflakes (kept separate for clarity)
+        class ButtonSnowflake {
+            constructor(x, y, sizeMultiplier = 1) {
+                this.x = x;
+                this.y = y;
+                this.size = (Math.random() * 2 + 0.5) * sizeMultiplier;
+                this.speedY = (Math.random() * 0.8 + 0.2) * sizeMultiplier;
+            }
+            update(canvas) {
+                 if (!canvas) return;
+                const logicalHeight = canvas.clientHeight;
+                const logicalWidth = canvas.clientWidth;
+                this.y += this.speedY;
+                if (this.y > logicalHeight + this.size) {
+                    this.y = 0 - this.size;
+                    this.x = Math.random() * logicalWidth;
+                }
+            }
+            draw(ctx) {
+                if (!ctx) return;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+
+        // --- Snowflake Animation Functions ---
+
+        // Resize function for MAIN canvas (handles DPR)
+        function resizeMainCanvas() {
+            if (!mainCanvas) return false;
+            const dpr = window.devicePixelRatio || 1;
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+            const physicalWidth = Math.round(newWidth * dpr);
+            const physicalHeight = Math.round(newHeight * dpr);
+
+            if (mainCanvas.width !== physicalWidth || mainCanvas.height !== physicalHeight) {
+                 mainCanvas.style.width = `${newWidth}px`;
+                 mainCanvas.style.height = `${newHeight}px`;
+                 mainCanvas.width = physicalWidth;
+                 mainCanvas.height = physicalHeight;
+                 if (mainCtx) {
+                    mainCtx.setTransform(dpr, 0, 0, dpr, 0, 0); // Apply scaling transform
+                 }
+                 console.log(`Resized mainCanvas`);
+                 return true;
+            }
+            return false;
+        }
+
+        // Resize function for BUTTON canvas (handles DPR)
+        function resizeButtonCanvas() {
+            if (!buttonCanvas) return false;
+            const parent = buttonCanvas.parentElement;
+            if (!parent) return false;
+            const dpr = window.devicePixelRatio || 1;
+            const newWidth = parent.clientWidth;
+            const newHeight = parent.clientHeight;
+            const physicalWidth = Math.round(newWidth * dpr);
+            const physicalHeight = Math.round(newHeight * dpr);
+
+            if (buttonCanvas.width !== physicalWidth || buttonCanvas.height !== physicalHeight) {
+                 buttonCanvas.style.width = `${newWidth}px`;
+                 buttonCanvas.style.height = `${newHeight}px`;
+                 buttonCanvas.width = physicalWidth;
+                 buttonCanvas.height = physicalHeight;
+                 if (buttonCtx) {
+                    buttonCtx.setTransform(dpr, 0, 0, dpr, 0, 0); // Apply scaling transform
+                 }
+                 console.log(`Resized buttonCanvas`);
+                 return true;
+            }
+            return false;
+        }
+
+        // Create snowflakes for the MAIN canvas
+        function createMainSnowflakes() {
+            if (!mainCanvas || !mainCtx) return;
+            mainSnowflakesArray = []; // Clear existing
+            // Use logical dimensions for initial positioning
+            const logicalWidth = mainCanvas.clientWidth;
+            const logicalHeight = mainCanvas.clientHeight;
+            for (let i = 0; i < numberOfMainSnowflakes; i++) {
+                mainSnowflakesArray.push(
+                    new MainSnowflake( // Use the MainSnowflake class
+                        Math.random() * logicalWidth,
+                        Math.random() * logicalHeight
+                    )
+                );
+            }
+             console.log(`Created ${numberOfMainSnowflakes} main flakes`);
+        }
+
+        // Create snowflakes for the BUTTON canvas
+        function createButtonSnowflakes() {
+            if (!buttonCanvas || !buttonCtx) return;
+            buttonSnowflakesArray = []; // Clear existing
+            const logicalWidth = buttonCanvas.clientWidth;
+            const logicalHeight = buttonCanvas.clientHeight;
+            for (let i = 0; i < numberOfButtonSnowflakes; i++) {
+                buttonSnowflakesArray.push(
+                    new ButtonSnowflake( // Use the ButtonSnowflake class
+                        Math.random() * logicalWidth,
+                        Math.random() * logicalHeight,
+                        0.5 // size multiplier
+                    )
+                );
+            }
+             console.log(`Created ${numberOfButtonSnowflakes} button flakes`);
+        }
+
+        // Animation loop for the MAIN background canvas
+        function animateMainSnowflakes() {
+            if (mainSnowAnimationId === null) return; // Check if stopped
+
+            if (!mainCtx || !mainCanvas || !body.classList.contains('theme-snow')) {
+                stopMainSnowAnimation();
+                return;
+            }
+
+            mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height); // Clear using physical dimensions
+            for (let i = 0; i < mainSnowflakesArray.length; i++) {
+                mainSnowflakesArray[i].update(); // Update uses logical dimensions internally now
+                mainSnowflakesArray[i].draw(); // Draw uses logical coordinates
+            }
+            mainSnowAnimationId = requestAnimationFrame(animateMainSnowflakes); // Continue loop
+        }
+
+
+        // Animation loop for the BUTTON preview canvas
+        function animateButtonSnowflakes() {
+            if (buttonSnowAnimationId === null) return; // Check if stopped
+
+            if (!buttonCtx || !buttonCanvas || !body.classList.contains('theme-retro')) {
+                 stopButtonSnowAnimation();
+                 return;
+            }
+
+             buttonCtx.clearRect(0, 0, buttonCanvas.width, buttonCanvas.height);
+             for (let i = 0; i < buttonSnowflakesArray.length; i++) {
+                 buttonSnowflakesArray[i].update(buttonCanvas); // Update needs canvas
+                 buttonSnowflakesArray[i].draw(buttonCtx); // Draw needs context
+             }
+             buttonSnowAnimationId = requestAnimationFrame(animateButtonSnowflakes); // Continue loop
+        }
+
+        // --- Animation Control Functions ---
+
+        // Start the main snowflake animation
+        function startMainSnowAnimation() {
+            if (mainSnowAnimationId !== null || !mainCtx || !mainCanvas) return;
+             console.log("Attempting to start MAIN snow animation...");
+             const resized = resizeMainCanvas();
+             if (resized || mainSnowflakesArray.length === 0) {
+                 createMainSnowflakes();
+             }
+             mainSnowAnimationId = requestAnimationFrame(animateMainSnowflakes);
+             console.log(`Main animation requested with ID: ${mainSnowAnimationId}`);
+        }
+
+        // Start the button snowflake animation
+        function startButtonSnowAnimation() {
+            if (buttonSnowAnimationId !== null || !buttonCtx || !buttonCanvas) return;
+             console.log("Attempting to start BUTTON snow animation...");
+             const resized = resizeButtonCanvas();
+             if (resized || buttonSnowflakesArray.length === 0) {
+                 createButtonSnowflakes();
+             }
+             buttonSnowAnimationId = requestAnimationFrame(animateButtonSnowflakes);
+             console.log(`Button animation requested with ID: ${buttonSnowAnimationId}`);
+        }
+
+
+        // Stops the main snow animation
+        function stopMainSnowAnimation() {
+            if (mainSnowAnimationId !== null) {
+                cancelAnimationFrame(mainSnowAnimationId);
+                mainSnowAnimationId = null;
+                if (mainCtx && mainCanvas) mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+                console.log("Stopped MAIN snow animation.");
+            }
+        }
+
+        // Stops the button snow animation
+        function stopButtonSnowAnimation() {
+             if (buttonSnowAnimationId !== null) {
+                cancelAnimationFrame(buttonSnowAnimationId);
+                buttonSnowAnimationId = null;
+                if (buttonCtx && buttonCanvas) buttonCtx.clearRect(0, 0, buttonCanvas.width, buttonCanvas.height);
+                console.log("Stopped BUTTON snow animation.");
+            }
+        }
+
+
+        // --- Theme Switching Logic ---
+        function applyTheme(themeName) {
+             console.log(`Applying theme: ${themeName}`);
+            stopMainSnowAnimation();
+            stopButtonSnowAnimation();
+            body.classList.remove('theme-snow', 'theme-retro');
+            body.classList.add(`theme-${themeName}`);
+            localStorage.setItem('lakehouse-theme', themeName);
+            requestAnimationFrame(() => {
+                 if (themeName === 'snow') {
+                     startMainSnowAnimation();
+                 } else if (themeName === 'retro') {
+                     startButtonSnowAnimation();
+                 }
+            });
+            handleMobileTitle(themeName);
+        }
+
+        // Adjusts the H1 title text based on theme and screen size
+        function handleMobileTitle(currentTheme) {
+             if (title && window.innerWidth <= 768) {
+                title.textContent = (currentTheme === 'snow') ? "lakehouse" : "lakehouse.ink";
+            } else if (title) {
+                 title.textContent = "lakehouse.ink";
+            }
+        }
+
+        // --- Event Listeners ---
+        if (themeSwitcher) {
+            themeSwitcher.addEventListener('click', () => {
+                const currentTheme = body.classList.contains('theme-snow') ? 'snow' : 'retro';
+                const newTheme = currentTheme === 'snow' ? 'retro' : 'snow';
+                applyTheme(newTheme);
+            });
+        }
+
+         window.addEventListener('resize', () => {
+             const currentTheme = localStorage.getItem('lakehouse-theme') || 'snow'; // Default to snow
+             const mainResized = resizeMainCanvas();
+             const buttonResized = resizeButtonCanvas();
+             if (currentTheme === 'snow' && mainResized) {
+                 console.log("Recreating main snowflakes after resize.");
+                 stopMainSnowAnimation();
+                 createMainSnowflakes();
+                 startMainSnowAnimation();
+             } else if (currentTheme === 'retro' && buttonResized) {
+                  console.log("Recreating button snowflakes after resize.");
+                  stopButtonSnowAnimation();
+                  createButtonSnowflakes();
+                  startButtonSnowAnimation();
+             }
+             handleMobileTitle(currentTheme);
+         });
+
+
+        // --- Initialization on Page Load ---
+        document.addEventListener("DOMContentLoaded", () => {
+             console.log("DOM Loaded. Initializing theme...");
+             if (!mainCtx) console.error("Failed to get 2D context for main canvas");
+             if (!buttonCtx) console.error("Failed to get 2D context for button canvas");
+             resizeMainCanvas();
+             resizeButtonCanvas();
+             const savedTheme = localStorage.getItem('lakehouse-theme') || 'snow'; // Default to snow
+             applyTheme(savedTheme);
+             handleMobileTitle(savedTheme);
+        });
+
+    </script>
+</body>
+</html>
