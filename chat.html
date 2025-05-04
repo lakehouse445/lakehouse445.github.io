@@ -324,7 +324,7 @@
         }
 
         function startAutoMessages() {
-             addMessage("Connecting to Lakehouse Mainframe...", 500);
+             addMessage("Connecting to Lakehouse Intranet...", 500);
              addMessage("User Authenticated: " + localStorage.getItem("username"), 1000);
              addMessage("Establishing Secure IRC Tunnel...", 1500);
              addMessage("Warning: High network latency detected.", 2500);
@@ -338,7 +338,7 @@
                 chatWindow.appendChild(queueElem);
                 queueCounter = createQueueCounter();
                 setInterval(() => {
-                    queueElem.textContent = `Position in Queue: ${queueCounter()}`;
+                    queueElem.textContent = `Position in Queue: ${queueCounter()}. Please wait.`;
                     chatWindow.scrollTop = chatWindow.scrollHeight;
                 }, 1000);
             }, 4500);
