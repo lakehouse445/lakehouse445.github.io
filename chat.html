@@ -262,17 +262,18 @@
 
     <audio id="submit-sound" src="https://assets.onecompiler.app/436kcxhsw/43ezp8v3b/745925__projecteur__vaporwave-theme-vhs-distorted.mp3"></audio>
 
-    <script>
+<script>
+        // Get initial elements (might become detached later)
         const usernameOverlay = document.getElementById("username-overlay");
-        const usernameInput = document.getElementById("username-input");
-        const submitUsernameButton = document.getElementById("submit-username");
+        const initialUsernameInput = document.getElementById("username-input"); // Renamed for clarity
+        const initialSubmitUsernameButton = document.getElementById("submit-username"); // Renamed for clarity
         const chatWindow = document.getElementById("chat-window");
         const audioElement = document.getElementById('submit-sound');
         const confirmationOverlay = document.getElementById('confirmation-overlay');
         const displayUsername = document.getElementById('display-username');
         const confirmYesBtn = document.getElementById('confirm-yes');
         const confirmChangeBtn = document.getElementById('confirm-change');
-        
+
         let queueCounter = null;
         audioElement.volume = 0.5;
 
@@ -295,82 +296,130 @@
         }
 
         function createQueueCounter() {
-            let base = 16128;
-            let current = base;
-            let phase = 'down';
-            let counter = 0;
-            
-            return function() {
-                if (phase === 'down') {
-                    current -= Math.floor(Math.random() * 3) + 1;
-                    counter++;
-                    if (counter > 2) {
-                        phase = 'up';
-                        counter = 0;
-                    }
-                } else {
-                    current += Math.floor(Math.random() * 5) + 3;
-                    counter++;
-                    if (counter > 3) {
-                        phase = 'down';
-                        counter = 0;
-                    }
-                }
-                return current;
-            };
+             let base = 16128;
+             let current = base;
+             let phase = 'down';
+             let counter = 0;
+
+             return function() {
+                 if (phase === 'down') {
+                     current -= Math.floor(Math.random() * 3) + 1;
+                     counter++;
+                     if (counter > 2) {
+                         phase = 'up';
+                         counter = 0;
+                     }
+                 } else {
+                     current += Math.floor(Math.random() * 5) + 3;
+                     counter++;
+                     if (counter > 3) {
+                         phase = 'down';
+                         counter = 0;
+                     }
+                 }
+                 if (current < base - 20) current = base - Math.floor(Math.random()*5);
+                 if (current > base + 30) current = base + Math.floor(Math.random()*10);
+                 return current;
+             };
         }
 
         function startAutoMessages() {
-            addMessage("Lakehouse is currently chatting with someone.", 500);
-            addMessage("Please Wait", 1500);
-            
+             addMessage("Connecting to Lakehouse Mainframe...", 500);
+             addMessage("User Authenticated: " + localStorage.getItem("username"), 1000);
+             addMessage("Establishing Secure IRC Tunnel...", 1500);
+             addMessage("Warning: High network latency detected.", 2500);
+             addMessage("Lakehouse is currently engaged.", 3000);
+             addMessage("Calculating queue position...", 3500);
+
             setTimeout(() => {
                 const queueElem = document.createElement("div");
                 queueElem.className = "chat-message";
                 queueElem.style.opacity = "1";
                 chatWindow.appendChild(queueElem);
-                
                 queueCounter = createQueueCounter();
                 setInterval(() => {
-                    queueElem.textContent = `You are currently ${queueCounter()} in queue.`;
+                    queueElem.textContent = `Position in Queue: ${queueCounter()}`;
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
                 }, 1000);
-            }, 2500);
+            }, 4500);
         }
 
         function showConfirmation(username) {
             displayUsername.textContent = username;
             confirmationOverlay.style.display = 'flex';
+            usernameOverlay.style.display = 'none';
         }
 
-        // Event Listeners
-        submitUsernameButton.addEventListener("click", () => {
-            const username = usernameInput.value.trim();
+        // --- NAMED HANDLER FUNCTIONS ---
+        function handleSubmitUsername() {
+            // Always get the current input element inside the handler
+            const currentUsernameInput = document.getElementById("username-input");
+            if (!currentUsernameInput) return; // Safety check
+
+            const username = currentUsernameInput.value.trim();
             if (username) {
                 playSound();
                 localStorage.setItem("username", username);
-                usernameInput.value = '';
-                document.getElementById("username-container").innerHTML = '<div id="spinner"></div>';
-                setTimeout(() => window.location.reload(), 1500);
+                currentUsernameInput.value = ''; // Clear input
+                document.getElementById("username-container").innerHTML = '<div id="spinner"></div><p style="margin-top: 10px;">Encrypting...</p>';
+                setTimeout(() => {
+                     usernameOverlay.style.display = 'none';
+                     startAutoMessages();
+                }, 1500);
             }
-        });
+        }
+
+        function handleUsernameKeypress(e) {
+            if (e.key === "Enter") {
+                 // Trigger the submit handler
+                 handleSubmitUsername();
+            }
+        }
+        // --- END OF NAMED HANDLER FUNCTIONS ---
+
+
+        // --- Initial Event Listeners ---
+        if (initialSubmitUsernameButton) {
+             initialSubmitUsernameButton.addEventListener("click", handleSubmitUsername);
+        }
+        if (initialUsernameInput) {
+             initialUsernameInput.addEventListener("keypress", handleUsernameKeypress);
+        }
 
         confirmYesBtn.addEventListener('click', () => {
-            playSound();
-            confirmationOverlay.style.display = 'none';
-            usernameOverlay.style.display = 'none';
-            startAutoMessages();
+             playSound();
+             confirmationOverlay.style.display = 'none';
+             startAutoMessages();
         });
 
         confirmChangeBtn.addEventListener('click', () => {
             confirmationOverlay.style.display = 'none';
-            usernameOverlay.style.display = 'flex';
+            // Rebuild HTML - this destroys old elements and their listeners
+            document.getElementById("username-container").innerHTML = `
+                <h1>Enter Your Username</h1>
+                <input type="text" id="username-input" placeholder="Username">
+                <br>
+                <button id="submit-username">Submit</button>
+            `;
+
+            // --- Re-attach listeners to the NEW elements ---
+            const newUsernameInput = document.getElementById("username-input");
+            const newSubmitButton = document.getElementById("submit-username");
+
+            if (newSubmitButton) {
+                newSubmitButton.addEventListener("click", handleSubmitUsername);
+            }
+            if (newUsernameInput) {
+                newUsernameInput.addEventListener("keypress", handleUsernameKeypress);
+                newUsernameInput.focus(); // Focus the new input field
+            }
+            // --- End of Re-attachment ---
+
+            usernameOverlay.style.display = 'flex'; // Show the overlay again
         });
 
-        usernameInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") submitUsernameButton.click();
-        });
 
-        // Initial Load
+        // Initial Load Check
         window.addEventListener("load", () => {
             const storedUsername = localStorage.getItem("username");
             if (storedUsername) {
