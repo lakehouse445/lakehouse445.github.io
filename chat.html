@@ -53,56 +53,53 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border-radius: 15px;
+            border-radius: 15px; /* Optional: Adjust if you want screen curvature effect */
             box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.2),
-                       inset 0 0 15px rgba(0, 255, 0, 0.4),
-                       0 0 50px rgba(0, 255, 0, 0.1);
+                        inset 0 0 15px rgba(0, 255, 0, 0.4),
+                        0 0 50px rgba(0, 255, 0, 0.1);
             border: 2px solid rgba(0, 255, 0, 0.1);
         }
 
         @keyframes scanline {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(100%); }
+             /* Scanline moves down, loops by jumping up */
+             0% { background-position: 0 0; }
+             100% { background-position: 0 100%; }
+             /* Or keep your original transform if you prefer that look */
+             /* from { transform: translateY(-100%); } */
+             /* to { transform: translateY(100%); } */
         }
 
+        /* --- MODIFIED SECTION START --- */
         .matrix-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 200%;
+            height: 100vh; /* Changed from 200% */
             background: black;
             overflow: hidden;
             z-index: -2;
-        }
-
-        .matrix-bg::before,
-        .matrix-bg::after {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 50%;
+            /* Apply background directly */
             background-image: radial-gradient(#00FF00 1px, transparent 1px);
-            background-size: 20px 20px;
-            opacity: 0.1;
-            animation: matrix 20s linear infinite;
+            background-size: 20px 20px; /* Pattern size */
+            opacity: 0.1; /* Keep desired opacity */
+            /* Apply new animation */
+            animation: matrix-scroll 20s linear infinite;
         }
 
-        .matrix-bg::before {
-            top: 0;
-            left: 0;
+        /* Define the NEW keyframes for background scrolling */
+        @keyframes matrix-scroll {
+            from {
+                background-position-y: 0px; /* Start position */
+            }
+            to {
+                /* Scroll upwards by a multiple of background-size height (20px) */
+                /* Scrolls 20 repetitions (400px) over 20 seconds */
+                background-position-y: -400px;
+            }
         }
+        /* --- MODIFIED SECTION END --- */
 
-        .matrix-bg::after {
-            top: 50%;
-            left: 0;
-            animation-delay: -10s;
-        }
-
-        @keyframes matrix {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-50%); }
-        }
 
         #chat-window {
             position: absolute;
@@ -112,8 +109,9 @@
             height: 100%;
             padding: 20px;
             overflow-y: auto;
-            background: transparent;
+            background: transparent; /* Ensure it doesn't cover the animated bg */
             text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+            z-index: 1; /* Ensure chat is above matrix-bg */
         }
 
         .chat-message {
@@ -206,7 +204,7 @@
             height: 100%;
             backdrop-filter: blur(7px);
             background: rgba(0, 0, 0, 0.75);
-            display: none;
+            display: none; /* Initially hidden */
             justify-content: center;
             align-items: center;
             z-index: 1001;
@@ -241,7 +239,7 @@
     <div class="matrix-bg"></div>
     <div class="crt-effect"></div>
     <div id="chat-window"></div>
-    
+
     <div id="username-overlay">
         <div id="username-container">
             <h1>Enter Your Username</h1>
@@ -250,7 +248,7 @@
             <button id="submit-username">Submit</button>
         </div>
     </div>
-    
+
     <div id="confirmation-overlay">
         <div id="confirmation-container">
             <h1>Use existing username?</h1>
@@ -324,7 +322,7 @@
         }
 
         function startAutoMessages() {
-             addMessage("Connecting to Lakehouse Intranet...", 500);
+             addMessage("Connecting to Lakehouse Mainframe...", 500);
              addMessage("User Authenticated: " + localStorage.getItem("username"), 1000);
              addMessage("Establishing Secure IRC Tunnel...", 1500);
              addMessage("Warning: High network latency detected.", 2500);
@@ -338,7 +336,7 @@
                 chatWindow.appendChild(queueElem);
                 queueCounter = createQueueCounter();
                 setInterval(() => {
-                    queueElem.textContent = `Position in Queue: ${queueCounter()}. Please wait.`;
+                    queueElem.textContent = `Position in Queue: ${queueCounter()}`;
                     chatWindow.scrollTop = chatWindow.scrollHeight;
                 }, 1000);
             }, 4500);
