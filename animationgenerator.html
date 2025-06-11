@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simple Wavy Text with Editor & Exporter</title>
+    <title>Wavy Text Editor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         body {
             display: flex;
-            flex-direction: column; /* Stack editor and canvas vertically */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #1a1a1a; /* Darker background */
+            background-color: #1a1a1a;
             font-family: monospace;
             color: white;
             padding: 20px;
@@ -21,7 +21,7 @@
             background-color: #000;
             border-radius: 8px;
             box-shadow: 0 0 20px rgba(76, 29, 149, 0.5);
-            max-width: 100%; /* Ensure canvas doesn't overflow */
+            max-width: 100%;
             max-height: 50vh;
         }
         #main-container {
@@ -40,7 +40,7 @@
             align-items: center;
         }
         #editor label { justify-self: end; }
-        #editor input, #editor input[type="file"] {
+        #editor input, #editor input[type="file"], #editor input[type="range"] {
             background-color: #444;
             border: 1px solid #666;
             color: white;
@@ -48,12 +48,10 @@
             border-radius: 4px;
             width: 200px;
         }
+        #editor input[type="range"] { padding: 0; }
         #export-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            grid-column: 1 / -1; /* Span both columns */
-            justify-content: center;
+            grid-column: 1 / -1;
+            text-align: center;
         }
         #export-controls button {
             background-color: #4f46e5;
@@ -62,28 +60,38 @@
             padding: 8px 12px;
             border-radius: 5px;
             cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
         }
         #export-controls button:disabled {
             background-color: #555;
             cursor: not-allowed;
         }
-        #status, #debug-options {
+        #status, #debug-options, #subtitle-toggle {
             grid-column: 1 / -1;
             text-align: center;
             font-size: 0.9em;
             color: #ccc;
         }
-        #debug-options {
+        #debug-options, #subtitle-toggle {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             margin-top: 10px;
         }
-        #debug-options input {
-           width: auto;
+        #debug-options input, #subtitle-toggle input { width: auto; }
+        #subtitle-settings {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px 20px;
+            align-items: center;
+            border-top: 1px solid #444;
+            margin-top: 10px;
+            padding-top: 10px;
         }
-        /* Info Button & Modal */
+        .hidden { display: none !important; }
         #info-button {
             position: absolute;
             top: 20px;
@@ -103,10 +111,7 @@
         }
         #info-modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.7);
             display: flex;
             align-items: center;
@@ -120,107 +125,103 @@
             max-width: 500px;
             color: #eee;
         }
-        #info-modal-content h2 {
-            margin-top: 0;
-            color: white;
-        }
-        #info-modal-content code {
-            background-color: #444;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-        #info-modal-content ol {
-            padding-left: 20px;
-        }
-        #info-modal-content li {
-            margin-bottom: 10px;
-        }
-        /* FIX: Added this style to hide the modal */
-        .hidden {
-            display: none !important;
-        }
+        #info-modal-content h2 { margin-top: 0; color: white; }
+        #info-modal-content code { background-color: #444; padding: 2px 5px; border-radius: 3px; }
+        #info-modal-content ol { padding-left: 20px; }
+        #info-modal-content li { margin-bottom: 10px; }
     </style>
 </head>
 <body>
     <button id="info-button">?</button>
-
     <div id="info-modal" class="hidden">
         <div id="info-modal-content">
             <h2>How to Use This Tool</h2>
-            <p>This tool creates a "wavy rainbow text" animation and allows you to export it.</p>
-            <p>Made by lakehouse circa 2025.</p>
-            <p>Based on https://codepen.io/adelciotto/pen/bePLZE</p>
             <ol>
-                <li>Adjust the animation settings in the editor to get the look you want.</li>
-                <li>Click a "Capture" button to generate the animation frames. This will download a <code>.zip</code> file.</li>
+                <li>Adjust settings in the editor.</li>
+                <li>Click "Start Capture" to generate a <code>.zip</code> file of animation frames.</li>
                 <li>Unzip the downloaded file into a new folder.</li>
                 <li><strong>IMPORTANT:</strong> Copy your <code>ffmpeg.exe</code> file into that same folder.</li>
-                <li>Double-click the <code>create_video.bat</code> file inside the folder to create the final <code>.mp4</code> video.</li>
+                <li>Double-click the <code>create_video.bat</code> file to create the final <code>.mp4</code> video.</li>
             </ol>
             <button id="close-modal-button">Close</button>
         </div>
     </div>
 
-
     <div id="main-container">
-        <!-- Editor UI -->
         <div id="editor">
             <label for="textInput">Text:</label>
-            <input type="text" id="textInput" value="Lakehouse">
-
+            <input type="text" id="textInput" value="New text">
             <label for="fontUpload">Font:</label>
             <input type="file" id="fontUpload" accept=".ttf,.otf,.woff">
-
             <label for="amplitudeInput">Amplitude:</label>
             <input type="number" id="amplitudeInput" value="5">
-
             <label for="waveSpeedInput">Wave Speed:</label>
             <input type="number" id="waveSpeedInput" value="250">
-            
             <label for="fontSizeInput">Font Size:</label>
             <input type="number" id="fontSizeInput" value="55">
-
+            <label for="kerningInput">Letter Spacing:</label>
+            <input type="number" id="kerningInput" value="10">
             <label for="widthInput">Width:</label>
-            <input type="number" id="widthInput" value="3840">
-
+            <input type="number" id="widthInput" value="1920">
             <label for="heightInput">Height:</label>
-            <input type="number" id="heightInput" value="2160">
-            
-            <div id="export-controls">
-                <button id="capture5s">Capture 5s</button>
-                <button id="capture10s">Capture 10s</button>
-                <button id="capture15s">Capture 15s</button>
+            <input type="number" id="heightInput" value="1080">
+
+            <div id="subtitle-toggle">
+                <input type="checkbox" id="subtitleCheckbox">
+                <label for="subtitleCheckbox">Show Subtitle</label>
+            </div>
+            <div id="subtitle-settings" class="hidden">
+                <label for="subtitleTextInput">Subtitle Text:</label>
+                <input type="text" id="subtitleTextInput" value="Subtitle text">
+                <label for="subtitleFontSizeInput">Subtitle Font Size:</label>
+                <input type="number" id="subtitleFontSizeInput" value="30">
+                 <label for="subtitleYOffsetInput">Subtitle Y-Offset:</label>
+                <input type="number" id="subtitleYOffsetInput" value="100">
+                <label for="subtitleFadeInDelayInput">Fade-In Delay (s):</label>
+                <input type="range" id="subtitleFadeInDelayInput" min="0" max="15" step="0.1" value="1">
+                <span id="subtitleFadeInDelayValue" style="justify-self: start;">1.0s</span>
+                <label for="subtitleFadeDurationInput">Fade Length (s):</label>
+                <input type="range" id="subtitleFadeDurationInput" min="0.1" max="5" step="0.1" value="1">
+                <span id="subtitleFadeDurationValue" style="justify-self: start;">1.0s</span>
             </div>
 
+            <div id="export-controls">
+                <label for="captureDurationSlider">Capture Duration (s): <span id="captureDurationValue">5</span>s</label>
+                <input type="range" id="captureDurationSlider" min="1" max="60" value="5">
+                <button id="startCaptureBtn">Start Capture</button>
+            </div>
             <div id="debug-options">
                 <input type="checkbox" id="upscaleCheckbox">
                 <label for="upscaleCheckbox">Upscale 2x on Capture</label>
             </div>
-            
             <div id="status">Ready</div>
         </div>
-
-        <!-- Canvas will be created here by script -->
     </div>
 
 <script>
-    // --- Configuration (now mutable) ---
     let config = {
-        width: 3840,
-        height: 2160,
+        width: 1920,
+        height: 1080,
         amplitude: 5,
         waveSpeed: 250,
-        textToAnimate: 'Lakehouse',
+        textToAnimate: 'New text',
         fontSize: 55,
-        fontFamily: 'Courier New'
+        kerning: 10,
+        fontFamily: 'Courier New',
+        subtitleEnabled: false,
+        subtitleText: 'Subtitle text',
+        subtitleFontSize: 30,
+        subtitleYOffset: 100,
+        subtitleFadeInDelay: 1,
+        subtitleFadeDuration: 1
     };
 
-    // --- DOM Elements ---
     const textInput = document.getElementById('textInput');
     const fontUpload = document.getElementById('fontUpload');
     const amplitudeInput = document.getElementById('amplitudeInput');
     const waveSpeedInput = document.getElementById('waveSpeedInput');
     const fontSizeInput = document.getElementById('fontSizeInput');
+    const kerningInput = document.getElementById('kerningInput');
     const widthInput = document.getElementById('widthInput');
     const heightInput = document.getElementById('heightInput');
     const upscaleCheckbox = document.getElementById('upscaleCheckbox');
@@ -228,68 +229,68 @@
     const infoButton = document.getElementById('info-button');
     const infoModal = document.getElementById('info-modal');
     const closeModalButton = document.getElementById('close-modal-button');
-    const captureButtons = [
-        document.getElementById('capture5s'),
-        document.getElementById('capture10s'),
-        document.getElementById('capture15s')
-    ];
+    const startCaptureBtn = document.getElementById('startCaptureBtn');
+    const captureDurationSlider = document.getElementById('captureDurationSlider');
+    const captureDurationValue = document.getElementById('captureDurationValue');
+    const subtitleCheckbox = document.getElementById('subtitleCheckbox');
+    const subtitleSettings = document.getElementById('subtitle-settings');
+    const subtitleTextInput = document.getElementById('subtitleTextInput');
+    const subtitleFontSizeInput = document.getElementById('subtitleFontSizeInput');
+    const subtitleYOffsetInput = document.getElementById('subtitleYOffsetInput');
+    const subtitleFadeInDelayInput = document.getElementById('subtitleFadeInDelayInput');
+    const subtitleFadeInDelayValue = document.getElementById('subtitleFadeInDelayValue');
+    const subtitleFadeDurationInput = document.getElementById('subtitleFadeDurationInput');
+    const subtitleFadeDurationValue = document.getElementById('subtitleFadeDurationValue');
 
-
-    // --- State Variables ---
     let canvas, ctx;
     let charObjs;
     let startTime = 0;
     let isCapturing = false;
-    let customFontURL = '';
 
-    /**
-     * Updates the config object from the UI and re-initializes the text.
-     */
     const updateFromEditor = () => {
         if (isCapturing) return;
         config.textToAnimate = textInput.value || ' ';
         config.amplitude = parseInt(amplitudeInput.value, 10);
         config.waveSpeed = parseInt(waveSpeedInput.value, 10);
         config.fontSize = parseInt(fontSizeInput.value, 10);
+        config.kerning = parseInt(kerningInput.value, 10);
         config.width = parseInt(widthInput.value, 10);
         config.height = parseInt(heightInput.value, 10);
+        config.subtitleEnabled = subtitleCheckbox.checked;
+        config.subtitleText = subtitleTextInput.value;
+        config.subtitleFontSize = parseInt(subtitleFontSizeInput.value, 10);
+        config.subtitleYOffset = parseInt(subtitleYOffsetInput.value, 10);
+        config.subtitleFadeInDelay = parseFloat(subtitleFadeInDelayInput.value);
+        config.subtitleFadeDuration = parseFloat(subtitleFadeDurationInput.value);
+
+        subtitleSettings.classList.toggle('hidden', !config.subtitleEnabled);
         
         canvas.width = config.width;
         canvas.height = config.height;
         initText(config);
     };
 
-    /**
-     * Creates an array of character objects for drawing.
-     * @param {object} currentConfig - The configuration object to use for calculation.
-     */
     const initText = (currentConfig) => {
         const fontStyle = `bold ${currentConfig.fontSize}px ${currentConfig.fontFamily}`;
         ctx.font = fontStyle;
         ctx.textBaseline = 'middle';
-        const totalTextWidth = ctx.measureText(currentConfig.textToAnimate).width;
+        const totalTextWidth = ctx.measureText(currentConfig.textToAnimate).width + (currentConfig.textToAnimate.length > 1 ? (currentConfig.textToAnimate.length - 1) * currentConfig.kerning : 0);
         let currentPosition = (currentConfig.width - totalTextWidth) / 2;
         charObjs = currentConfig.textToAnimate.split('').map((char, index) => {
             const charWidth = ctx.measureText(char).width;
             const charObj = { char, width: charWidth, position: currentPosition, index: index };
-            currentPosition += charWidth;
+            currentPosition += charWidth + currentConfig.kerning;
             return charObj;
         });
     };
     
-    /**
-     * Draws a single frame of the animation at a specific time.
-     * @param {number} time - The timestamp for the current frame.
-     * @param {object} currentConfig - The configuration object to use for drawing.
-     * @param {boolean} disableAntiAliasing - Flag to turn off smoothing.
-     */
     const drawFrameAtTime = (time, currentConfig, disableAntiAliasing = false) => {
         ctx.imageSmoothingEnabled = !disableAntiAliasing;
         ctx.clearRect(0, 0, currentConfig.width, currentConfig.height);
         ctx.fillStyle = 'black';
         ctx.fillRect(0,0, currentConfig.width, currentConfig.height);
 
-        const fontStyle = `bold ${currentConfig.fontSize}px ${currentConfig.fontFamily}`;
+        let fontStyle = `bold ${currentConfig.fontSize}px ${currentConfig.fontFamily}`;
         ctx.font = fontStyle;
         ctx.textBaseline = 'middle';
 
@@ -300,11 +301,29 @@
             ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
             ctx.fillText(charObj.char, charObj.position, currentConfig.height / 2 + y);
         });
+        
+        if (currentConfig.subtitleEnabled && time >= currentConfig.subtitleFadeInDelay * 1000) {
+            const fadeInStartTime = currentConfig.subtitleFadeInDelay * 1000;
+            const fadeDuration = currentConfig.subtitleFadeDuration * 1000;
+            const timeSinceFadeStart = time - fadeInStartTime;
+            
+            let opacity = 1;
+            if (fadeDuration > 0 && timeSinceFadeStart < fadeDuration) {
+                opacity = timeSinceFadeStart / fadeDuration;
+            }
+            
+            ctx.globalAlpha = opacity;
+            fontStyle = `bold ${currentConfig.subtitleFontSize}px ${currentConfig.fontFamily}`;
+            ctx.font = fontStyle;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText(currentConfig.subtitleText, currentConfig.width / 2, currentConfig.height / 2 + currentConfig.subtitleYOffset);
+            
+            ctx.globalAlpha = 1; // Reset alpha
+            ctx.textAlign = 'left'; // Reset alignment
+        }
     }
 
-    /**
-     * The main animation loop for the live preview.
-     */
     const animate = () => {
         if (!isCapturing) {
            drawFrameAtTime(Date.now() - startTime, config, false);
@@ -312,34 +331,26 @@
         requestAnimationFrame(animate);
     };
     
-    /**
-     * Handles font file upload.
-     */
     const handleFontUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = (event) => {
-            if (customFontURL) URL.revokeObjectURL(customFontURL);
-            
             const fontFace = new FontFace('user-uploaded-font', event.target.result);
             document.fonts.add(fontFace);
             fontFace.load().then(() => {
                 config.fontFamily = 'user-uploaded-font';
-                updateFromEditor(); // Redraw with the new font
+                updateFromEditor();
             }).catch(console.error);
         };
         reader.readAsArrayBuffer(file);
     };
 
-    /**
-     * Captures frames and packages them into a ZIP file.
-     */
-    const startCapture = async (durationSeconds) => {
+    const startCapture = async () => {
+        const durationSeconds = parseInt(captureDurationSlider.value, 10);
         if (isCapturing) return;
         isCapturing = true;
-        captureButtons.forEach(b => b.disabled = true);
+        startCaptureBtn.disabled = true;
         
         const originalConfig = { ...config };
         let captureConfig = { ...config };
@@ -347,10 +358,9 @@
         
         if (scaleFactor > 1) {
             statusDiv.textContent = 'Scaling config for capture...';
-            captureConfig.width *= scaleFactor;
-            captureConfig.height *= scaleFactor;
-            captureConfig.fontSize *= scaleFactor;
-            captureConfig.amplitude *= scaleFactor;
+            ['width', 'height', 'fontSize', 'amplitude', 'kerning', 'subtitleFontSize', 'subtitleYOffset'].forEach(key => {
+                captureConfig[key] *= scaleFactor;
+            });
             canvas.width = captureConfig.width;
             canvas.height = captureConfig.height;
             initText(captureConfig);
@@ -367,18 +377,16 @@
                 const time = i * (1000 / frameRate);
                 drawFrameAtTime(time, captureConfig, true); 
                 
-                const frameName = `frame_${String(i).padStart(4, '0')}.png`;
+                const frameName = `frame_${String(i).padStart(5, '0')}.png`;
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
                 zip.file(frameName, blob);
 
                 statusDiv.textContent = `Captured frame ${i + 1} of ${totalFrames}`;
-                if (i % 10 === 0) {
-                    await new Promise(resolve => setTimeout(resolve, 0));
-                }
+                if (i % 10 === 0) await new Promise(resolve => setTimeout(resolve, 0));
             }
 
             statusDiv.textContent = 'Creating FFmpeg batch file...';
-            const batContent = `@echo off\r\ncd /d "%~dp0"\r\nffmpeg -framerate ${frameRate} -i frame_%%04d.png -c:v libx264 -pix_fmt yuv420p -r ${frameRate} output.mp4\r\npause`;
+            const batContent = `@echo off\r\ncd /d "%~dp0"\r\nffmpeg -framerate ${frameRate} -i frame_%%05d.png -c:v libx264 -pix_fmt yuv420p -r ${frameRate} output.mp4\r\npause`;
             zip.file('create_video.bat', batContent);
 
             statusDiv.textContent = 'Generating ZIP file...';
@@ -392,7 +400,6 @@
             URL.revokeObjectURL(link.href);
             
         } finally {
-            // Restore original settings for live preview
             if (scaleFactor > 1) {
                 statusDiv.textContent = 'Restoring preview...';
                 canvas.width = originalConfig.width;
@@ -401,35 +408,30 @@
             }
             statusDiv.textContent = 'Ready';
             isCapturing = false;
-            captureButtons.forEach(b => b.disabled = false);
+            startCaptureBtn.disabled = false;
         }
     };
 
-    /**
-     * Initializes the canvas and starts the application.
-     */
     const start = () => {
+        const mainContainer = document.getElementById('main-container');
         canvas = document.createElement('canvas');
-        document.getElementById('main-container').appendChild(canvas);
+        mainContainer.appendChild(canvas);
         ctx = canvas.getContext('2d');
         updateFromEditor();
 
-        const allInputs = document.querySelectorAll('#editor input[type="text"], #editor input[type="number"]');
-        allInputs.forEach(input => input.addEventListener('input', updateFromEditor));
+        document.querySelectorAll('#editor input').forEach(input => input.addEventListener('input', updateFromEditor));
         fontUpload.addEventListener('change', handleFontUpload);
-
         infoButton.addEventListener('click', () => infoModal.classList.remove('hidden'));
         closeModalButton.addEventListener('click', () => infoModal.classList.add('hidden'));
-        
-        captureButtons[0].addEventListener('click', () => startCapture(5));
-        captureButtons[1].addEventListener('click', () => startCapture(10));
-        captureButtons[2].addEventListener('click', () => startCapture(15));
+        startCaptureBtn.addEventListener('click', startCapture);
+        captureDurationSlider.addEventListener('input', () => captureDurationValue.textContent = captureDurationSlider.value);
+        subtitleFadeInDelayInput.addEventListener('input', () => subtitleFadeInDelayValue.textContent = `${parseFloat(subtitleFadeInDelayInput.value).toFixed(1)}s`);
+        subtitleFadeDurationInput.addEventListener('input', () => subtitleFadeDurationValue.textContent = `${parseFloat(subtitleFadeDurationInput.value).toFixed(1)}s`);
         
         startTime = Date.now();
         animate();
     };
 
-    // Let's go!
     start();
 </script>
 </body>
