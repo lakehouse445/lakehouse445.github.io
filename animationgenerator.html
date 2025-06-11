@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Wavy Text Editor</title>
+    <title>Wavy Text Editor & Exporter</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         body {
@@ -32,11 +32,11 @@
         }
         #editor {
             background-color: #2d2d2d;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             display: grid;
             grid-template-columns: auto 1fr;
-            gap: 10px 20px;
+            gap: 15px 20px;
             align-items: center;
         }
         #editor label { justify-self: end; }
@@ -47,8 +47,27 @@
             padding: 5px;
             border-radius: 4px;
             width: 200px;
+            box-sizing: border-box;
         }
-        #editor input[type="range"] { padding: 0; }
+        #editor input[type="file"] {
+            padding: 3px;
+        }
+        #editor input[type="range"] { 
+            padding: 0;
+            width: 100%; 
+        }
+        .full-width-container {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .slider-label-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
         #export-controls {
             grid-column: 1 / -1;
             text-align: center;
@@ -63,38 +82,49 @@
             width: 100%;
             margin-top: 10px;
         }
-        #export-controls button:disabled {
+        #export-controls button:disabled, #test-controls button:disabled {
             background-color: #555;
             cursor: not-allowed;
         }
-        #status, #debug-options, #subtitle-toggle {
+        #test-controls {
+            grid-column: 1 / -1;
+        }
+        #test-controls button {
+             background-color: #ca8a04; /* yellow-600 */
+             color: white;
+             border: none;
+             padding: 8px 12px;
+             border-radius: 5px;
+             cursor: pointer;
+             width: 100%;
+        }
+        #status, .options-toggle {
             grid-column: 1 / -1;
             text-align: center;
             font-size: 0.9em;
             color: #ccc;
         }
-        #debug-options, #subtitle-toggle {
+        .options-toggle {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             margin-top: 10px;
         }
-        #debug-options input, #subtitle-toggle input { width: auto; }
-        #subtitle-settings {
+        .options-toggle input { width: auto; }
+        #subtitle-settings, #glow-settings {
             grid-column: 1 / -1;
             display: grid;
             grid-template-columns: auto 1fr;
-            gap: 10px 20px;
+            gap: 15px 20px;
             align-items: center;
             border-top: 1px solid #444;
             margin-top: 10px;
-            padding-top: 10px;
+            padding-top: 15px;
         }
         .hidden { display: none !important; }
-        #info-button {
+        .top-right-btn {
             position: absolute;
-            top: 20px;
             right: 20px;
             background-color: #4a5568;
             color: white;
@@ -108,6 +138,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background-color 0.2s;
+        }
+        #info-button {
+            top: 20px;
+        }
+        #debug-toggle-btn {
+            top: 70px; /* Position below the info button */
+        }
+        .top-right-btn.active {
+            background-color: #4f46e5; /* Active color */
         }
         #info-modal {
             position: fixed;
@@ -132,7 +172,9 @@
     </style>
 </head>
 <body>
-    <button id="info-button">?</button>
+    <button id="info-button" class="top-right-btn">?</button>
+    <button id="debug-toggle-btn" class="top-right-btn">!</button>
+
     <div id="info-modal" class="hidden">
         <div id="info-modal-content">
             <h2>How to Use This Tool</h2>
@@ -142,6 +184,7 @@
                 <li>Unzip the downloaded file into a new folder.</li>
                 <li><strong>IMPORTANT:</strong> Copy your <code>ffmpeg.exe</code> file into that same folder.</li>
                 <li>Double-click the <code>create_video.bat</code> file to create the final <code>.mp4</code> video.</li>
+                <li>This was based on <code>https://codepen.io/adelciotto/pen/bePLZE</code></li>
             </ol>
             <button id="close-modal-button">Close</button>
         </div>
@@ -166,7 +209,28 @@
             <label for="heightInput">Height:</label>
             <input type="number" id="heightInput" value="1080">
 
-            <div id="subtitle-toggle">
+            <div id="glow-toggle" class="options-toggle">
+                <input type="checkbox" id="glowCheckbox">
+                <label for="glowCheckbox">Enable Glow</label>
+            </div>
+            <div id="glow-settings" class="hidden">
+                <div class="full-width-container">
+                    <div class="slider-label-container">
+                        <label for="glowBlurInput">Glow Blur:</label>
+                        <span id="glowBlurValue">10px</span>
+                    </div>
+                    <input type="range" id="glowBlurInput" min="0" max="50" step="1" value="10">
+                </div>
+                <div class="full-width-container">
+                     <div class="slider-label-container">
+                        <label for="glowIntensityInput">Glow Intensity:</label>
+                        <span id="glowIntensityValue">0.5</span>
+                    </div>
+                    <input type="range" id="glowIntensityInput" min="0" max="1" step="0.05" value="0.5">
+                </div>
+            </div>
+
+            <div id="subtitle-toggle" class="options-toggle">
                 <input type="checkbox" id="subtitleCheckbox">
                 <label for="subtitleCheckbox">Show Subtitle</label>
             </div>
@@ -177,20 +241,34 @@
                 <input type="number" id="subtitleFontSizeInput" value="30">
                  <label for="subtitleYOffsetInput">Subtitle Y-Offset:</label>
                 <input type="number" id="subtitleYOffsetInput" value="100">
-                <label for="subtitleFadeInDelayInput">Fade-In Delay (s):</label>
-                <input type="range" id="subtitleFadeInDelayInput" min="0" max="15" step="0.1" value="1">
-                <span id="subtitleFadeInDelayValue" style="justify-self: start;">1.0s</span>
-                <label for="subtitleFadeDurationInput">Fade Length (s):</label>
-                <input type="range" id="subtitleFadeDurationInput" min="0.1" max="5" step="0.1" value="1">
-                <span id="subtitleFadeDurationValue" style="justify-self: start;">1.0s</span>
+                <div class="full-width-container">
+                    <div class="slider-label-container">
+                        <label for="subtitleFadeInDelayInput">Fade-In Delay (s):</label>
+                        <span id="subtitleFadeInDelayValue">1.0s</span>
+                    </div>
+                    <input type="range" id="subtitleFadeInDelayInput" min="0" max="15" step="0.1" value="1">
+                </div>
+                <div class="full-width-container">
+                    <div class="slider-label-container">
+                        <label for="subtitleFadeDurationInput">Fade Length (s):</label>
+                        <span id="subtitleFadeDurationValue">1.0s</span>
+                    </div>
+                    <input type="range" id="subtitleFadeDurationInput" min="0.1" max="5" step="0.1" value="1">
+                </div>
             </div>
 
-            <div id="export-controls">
-                <label for="captureDurationSlider">Capture Duration (s): <span id="captureDurationValue">5</span>s</label>
+            <div id="export-controls" class="full-width-container">
+                <div class="slider-label-container">
+                    <label for="captureDurationSlider">Capture Duration (s):</label>
+                    <span id="captureDurationValue">5s</span>
+                </div>
                 <input type="range" id="captureDurationSlider" min="1" max="60" value="5">
                 <button id="startCaptureBtn">Start Capture</button>
             </div>
-            <div id="debug-options">
+             <div id="test-controls">
+                <button id="runTestsBtn">Run Quick Tests</button>
+            </div>
+             <div class="options-toggle">
                 <input type="checkbox" id="upscaleCheckbox">
                 <label for="upscaleCheckbox">Upscale 2x on Capture</label>
             </div>
@@ -206,65 +284,88 @@
         waveSpeed: 250,
         textToAnimate: 'New text',
         fontSize: 55,
-        kerning: 10,
+        kerning: 1,
         fontFamily: 'Courier New',
+        glowEnabled: false,
+        glowBlur: 10,
+        glowIntensity: 0.5,
         subtitleEnabled: false,
         subtitleText: 'Subtitle text',
         subtitleFontSize: 30,
         subtitleYOffset: 100,
         subtitleFadeInDelay: 1,
-        subtitleFadeDuration: 1
+        subtitleFadeDuration: 1,
+        debugEnabled: false
     };
 
-    const textInput = document.getElementById('textInput');
-    const fontUpload = document.getElementById('fontUpload');
-    const amplitudeInput = document.getElementById('amplitudeInput');
-    const waveSpeedInput = document.getElementById('waveSpeedInput');
-    const fontSizeInput = document.getElementById('fontSizeInput');
-    const kerningInput = document.getElementById('kerningInput');
-    const widthInput = document.getElementById('widthInput');
-    const heightInput = document.getElementById('heightInput');
-    const upscaleCheckbox = document.getElementById('upscaleCheckbox');
-    const statusDiv = document.getElementById('status');
-    const infoButton = document.getElementById('info-button');
-    const infoModal = document.getElementById('info-modal');
-    const closeModalButton = document.getElementById('close-modal-button');
-    const startCaptureBtn = document.getElementById('startCaptureBtn');
-    const captureDurationSlider = document.getElementById('captureDurationSlider');
-    const captureDurationValue = document.getElementById('captureDurationValue');
-    const subtitleCheckbox = document.getElementById('subtitleCheckbox');
-    const subtitleSettings = document.getElementById('subtitle-settings');
-    const subtitleTextInput = document.getElementById('subtitleTextInput');
-    const subtitleFontSizeInput = document.getElementById('subtitleFontSizeInput');
-    const subtitleYOffsetInput = document.getElementById('subtitleYOffsetInput');
-    const subtitleFadeInDelayInput = document.getElementById('subtitleFadeInDelayInput');
-    const subtitleFadeInDelayValue = document.getElementById('subtitleFadeInDelayValue');
-    const subtitleFadeDurationInput = document.getElementById('subtitleFadeDurationInput');
-    const subtitleFadeDurationValue = document.getElementById('subtitleFadeDurationValue');
+    const allDOMControls = {
+        textInput: document.getElementById('textInput'),
+        fontUpload: document.getElementById('fontUpload'),
+        amplitudeInput: document.getElementById('amplitudeInput'),
+        waveSpeedInput: document.getElementById('waveSpeedInput'),
+        fontSizeInput: document.getElementById('fontSizeInput'),
+        kerningInput: document.getElementById('kerningInput'),
+        widthInput: document.getElementById('widthInput'),
+        heightInput: document.getElementById('heightInput'),
+        upscaleCheckbox: document.getElementById('upscaleCheckbox'),
+        statusDiv: document.getElementById('status'),
+        infoButton: document.getElementById('info-button'),
+        infoModal: document.getElementById('info-modal'),
+        closeModalButton: document.getElementById('close-modal-button'),
+        startCaptureBtn: document.getElementById('startCaptureBtn'),
+        captureDurationSlider: document.getElementById('captureDurationSlider'),
+        captureDurationValue: document.getElementById('captureDurationValue'),
+        subtitleCheckbox: document.getElementById('subtitleCheckbox'),
+        subtitleSettings: document.getElementById('subtitle-settings'),
+        subtitleTextInput: document.getElementById('subtitleTextInput'),
+        subtitleFontSizeInput: document.getElementById('subtitleFontSizeInput'),
+        subtitleYOffsetInput: document.getElementById('subtitleYOffsetInput'),
+        subtitleFadeInDelayInput: document.getElementById('subtitleFadeInDelayInput'),
+        subtitleFadeInDelayValue: document.getElementById('subtitleFadeInDelayValue'),
+        subtitleFadeDurationInput: document.getElementById('subtitleFadeDurationInput'),
+        subtitleFadeDurationValue: document.getElementById('subtitleFadeDurationValue'),
+        glowCheckbox: document.getElementById('glowCheckbox'),
+        glowSettings: document.getElementById('glow-settings'),
+        glowBlurInput: document.getElementById('glowBlurInput'),
+        glowBlurValue: document.getElementById('glowBlurValue'),
+        glowIntensityInput: document.getElementById('glowIntensityInput'),
+        glowIntensityValue: document.getElementById('glowIntensityValue'),
+        runTestsBtn: document.getElementById('runTestsBtn'),
+        debugToggleBtn: document.getElementById('debug-toggle-btn')
+    };
+
 
     let canvas, ctx;
     let charObjs;
     let startTime = 0;
     let isCapturing = false;
+    let isTesting = false;
+    // FPS Counter variables
+    let lastFrameTime = 0;
+    let fps = 0;
 
     const updateFromEditor = () => {
-        if (isCapturing) return;
-        config.textToAnimate = textInput.value || ' ';
-        config.amplitude = parseInt(amplitudeInput.value, 10);
-        config.waveSpeed = parseInt(waveSpeedInput.value, 10);
-        config.fontSize = parseInt(fontSizeInput.value, 10);
-        config.kerning = parseInt(kerningInput.value, 10);
-        config.width = parseInt(widthInput.value, 10);
-        config.height = parseInt(heightInput.value, 10);
-        config.subtitleEnabled = subtitleCheckbox.checked;
-        config.subtitleText = subtitleTextInput.value;
-        config.subtitleFontSize = parseInt(subtitleFontSizeInput.value, 10);
-        config.subtitleYOffset = parseInt(subtitleYOffsetInput.value, 10);
-        config.subtitleFadeInDelay = parseFloat(subtitleFadeInDelayInput.value);
-        config.subtitleFadeDuration = parseFloat(subtitleFadeDurationInput.value);
-
-        subtitleSettings.classList.toggle('hidden', !config.subtitleEnabled);
+        if (isCapturing || isTesting) return;
+        config.textToAnimate = allDOMControls.textInput.value || ' ';
+        config.amplitude = parseInt(allDOMControls.amplitudeInput.value, 10);
+        config.waveSpeed = parseInt(allDOMControls.waveSpeedInput.value, 10);
+        config.fontSize = parseInt(allDOMControls.fontSizeInput.value, 10);
+        config.kerning = parseInt(allDOMControls.kerningInput.value, 10);
+        config.width = parseInt(allDOMControls.widthInput.value, 10);
+        config.height = parseInt(allDOMControls.heightInput.value, 10);
+        config.subtitleEnabled = allDOMControls.subtitleCheckbox.checked;
+        config.subtitleText = allDOMControls.subtitleTextInput.value;
+        config.subtitleFontSize = parseInt(allDOMControls.subtitleFontSizeInput.value, 10);
+        config.subtitleYOffset = parseInt(allDOMControls.subtitleYOffsetInput.value, 10);
+        config.subtitleFadeInDelay = parseFloat(allDOMControls.subtitleFadeInDelayInput.value);
+        config.subtitleFadeDuration = parseFloat(allDOMControls.subtitleFadeDurationInput.value);
+        config.glowEnabled = allDOMControls.glowCheckbox.checked;
+        config.glowBlur = parseInt(allDOMControls.glowBlurInput.value, 10);
+        config.glowIntensity = parseFloat(allDOMControls.glowIntensityInput.value);
         
+        allDOMControls.subtitleSettings.classList.toggle('hidden', !config.subtitleEnabled);
+        allDOMControls.glowSettings.classList.toggle('hidden', !config.glowEnabled);
+
         canvas.width = config.width;
         canvas.height = config.height;
         initText(config);
@@ -293,24 +394,33 @@
         let fontStyle = `bold ${currentConfig.fontSize}px ${currentConfig.fontFamily}`;
         ctx.font = fontStyle;
         ctx.textBaseline = 'middle';
+        ctx.textAlign = 'left';
+
+        if (currentConfig.glowEnabled) ctx.shadowBlur = currentConfig.glowBlur;
 
         charObjs.forEach((charObj) => {
             const y = Math.sin(time / currentConfig.waveSpeed + charObj.index / 2.5) * currentConfig.amplitude;
             const normalizedY = (y + currentConfig.amplitude) / (currentConfig.amplitude * 2);
             const hue = normalizedY * 240;
-            ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
+            const color = `hsl(${hue}, 100%, 60%)`;
+            
+            if (currentConfig.glowEnabled) {
+                ctx.shadowColor = `hsla(${hue}, 100%, 60%, ${currentConfig.glowIntensity})`;
+            }
+            
+            ctx.fillStyle = color;
             ctx.fillText(charObj.char, charObj.position, currentConfig.height / 2 + y);
         });
+
+        if (currentConfig.glowEnabled) {
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'transparent';
+        }
         
         if (currentConfig.subtitleEnabled && time >= currentConfig.subtitleFadeInDelay * 1000) {
-            const fadeInStartTime = currentConfig.subtitleFadeInDelay * 1000;
+            const timeSinceFadeStart = time - (currentConfig.subtitleFadeInDelay * 1000);
             const fadeDuration = currentConfig.subtitleFadeDuration * 1000;
-            const timeSinceFadeStart = time - fadeInStartTime;
-            
-            let opacity = 1;
-            if (fadeDuration > 0 && timeSinceFadeStart < fadeDuration) {
-                opacity = timeSinceFadeStart / fadeDuration;
-            }
+            let opacity = fadeDuration > 0 ? Math.min(1, timeSinceFadeStart / fadeDuration) : 1;
             
             ctx.globalAlpha = opacity;
             fontStyle = `bold ${currentConfig.subtitleFontSize}px ${currentConfig.fontFamily}`;
@@ -319,14 +429,45 @@
             ctx.textAlign = 'center';
             ctx.fillText(currentConfig.subtitleText, currentConfig.width / 2, currentConfig.height / 2 + currentConfig.subtitleYOffset);
             
-            ctx.globalAlpha = 1; // Reset alpha
-            ctx.textAlign = 'left'; // Reset alignment
+            ctx.globalAlpha = 1; 
+            ctx.textAlign = 'left';
         }
+
+        if (config.debugEnabled) {
+            drawDebugInfo(time, currentConfig);
+        }
+    }
+    
+    const drawDebugInfo = (time, currentConfig) => {
+        ctx.font = '16px monospace';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        
+        const debugLines = [
+            `time: ${(time/1000).toFixed(2)}s`,
+            `fps: ${fps}`,
+            `amplitude: ${currentConfig.amplitude}`,
+            `waveSpeed: ${currentConfig.waveSpeed}`,
+            `fontSize: ${currentConfig.fontSize}`,
+            `kerning: ${currentConfig.kerning}`,
+            `glow: ${currentConfig.glowEnabled} (blur: ${currentConfig.glowBlur}, intensity: ${currentConfig.glowIntensity})`,
+            `subtitle: ${currentConfig.subtitleEnabled} (delay: ${currentConfig.subtitleFadeInDelay}s, fade: ${currentConfig.subtitleFadeDuration}s)`
+        ];
+        
+        debugLines.forEach((line, index) => {
+            ctx.fillText(line, 10, 10 + (index * 20));
+        });
     }
 
     const animate = () => {
-        if (!isCapturing) {
-           drawFrameAtTime(Date.now() - startTime, config, false);
+        const now = Date.now();
+        const delta = now - lastFrameTime;
+        fps = Math.round(1000 / delta);
+        lastFrameTime = now;
+
+        if (!isCapturing && !isTesting) {
+           drawFrameAtTime(now - startTime, config, false);
         }
         requestAnimationFrame(animate);
     };
@@ -347,19 +488,19 @@
     };
 
     const startCapture = async () => {
-        const durationSeconds = parseInt(captureDurationSlider.value, 10);
-        if (isCapturing) return;
+        const durationSeconds = parseInt(allDOMControls.captureDurationSlider.value, 10);
+        if (isCapturing || isTesting) return;
         isCapturing = true;
-        startCaptureBtn.disabled = true;
+        allDOMControls.startCaptureBtn.disabled = true;
         
         const originalConfig = { ...config };
         let captureConfig = { ...config };
-        const scaleFactor = upscaleCheckbox.checked ? 2 : 1;
+        const scaleFactor = allDOMControls.upscaleCheckbox.checked ? 2 : 1;
         
         if (scaleFactor > 1) {
-            statusDiv.textContent = 'Scaling config for capture...';
-            ['width', 'height', 'fontSize', 'amplitude', 'kerning', 'subtitleFontSize', 'subtitleYOffset'].forEach(key => {
-                captureConfig[key] *= scaleFactor;
+            allDOMControls.statusDiv.textContent = 'Scaling config for capture...';
+            ['width', 'height', 'fontSize', 'amplitude', 'kerning', 'subtitleFontSize', 'subtitleYOffset', 'glowBlur'].forEach(key => {
+                if (captureConfig[key] !== undefined) captureConfig[key] *= scaleFactor;
             });
             canvas.width = captureConfig.width;
             canvas.height = captureConfig.height;
@@ -370,7 +511,7 @@
         const totalFrames = durationSeconds * frameRate;
         const zip = new JSZip();
 
-        statusDiv.textContent = 'Starting capture...';
+        allDOMControls.statusDiv.textContent = 'Starting capture...';
 
         try {
             for (let i = 0; i < totalFrames; i++) {
@@ -381,18 +522,18 @@
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
                 zip.file(frameName, blob);
 
-                statusDiv.textContent = `Captured frame ${i + 1} of ${totalFrames}`;
+                allDOMControls.statusDiv.textContent = `Captured frame ${i + 1} of ${totalFrames}`;
                 if (i % 10 === 0) await new Promise(resolve => setTimeout(resolve, 0));
             }
 
-            statusDiv.textContent = 'Creating FFmpeg batch file...';
+            allDOMControls.statusDiv.textContent = 'Creating FFmpeg batch file...';
             const batContent = `@echo off\r\ncd /d "%~dp0"\r\nffmpeg -framerate ${frameRate} -i frame_%%05d.png -c:v libx264 -pix_fmt yuv420p -r ${frameRate} output.mp4\r\npause`;
             zip.file('create_video.bat', batContent);
 
-            statusDiv.textContent = 'Generating ZIP file...';
+            allDOMControls.statusDiv.textContent = 'Generating ZIP file...';
             const zipBlob = await zip.generateAsync({type: 'blob'});
 
-            statusDiv.textContent = 'Downloading...';
+            allDOMControls.statusDiv.textContent = 'Downloading...';
             const link = document.createElement('a');
             link.href = URL.createObjectURL(zipBlob);
             link.download = `wavy_text_capture.zip`;
@@ -401,16 +542,67 @@
             
         } finally {
             if (scaleFactor > 1) {
-                statusDiv.textContent = 'Restoring preview...';
+                allDOMControls.statusDiv.textContent = 'Restoring preview...';
                 canvas.width = originalConfig.width;
                 canvas.height = originalConfig.height;
                 initText(originalConfig);
             }
-            statusDiv.textContent = 'Ready';
+            allDOMControls.statusDiv.textContent = 'Ready';
             isCapturing = false;
-            startCaptureBtn.disabled = false;
+            allDOMControls.startCaptureBtn.disabled = false;
         }
     };
+
+    const runQuickTests = async () => {
+        if (isTesting || isCapturing) return;
+        isTesting = true;
+        const controlsToDisable = Object.values(allDOMControls).filter(el => el.tagName === 'BUTTON' || el.tagName === 'INPUT');
+        controlsToDisable.forEach(el => el.disabled = true);
+        
+        const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+        const triggerUpdate = (el) => el.dispatchEvent(new Event('input', { bubbles: true }));
+
+        try {
+            const checkboxes = [allDOMControls.glowCheckbox, allDOMControls.subtitleCheckbox, allDOMControls.upscaleCheckbox];
+            for (const box of checkboxes) {
+                allDOMControls.statusDiv.textContent = `Testing: ${box.id}`;
+                box.checked = true; triggerUpdate(box); await delay(500);
+                box.checked = false; triggerUpdate(box); await delay(500);
+            }
+
+            const numberInputs = [allDOMControls.amplitudeInput, allDOMControls.waveSpeedInput, allDOMControls.fontSizeInput, allDOMControls.kerningInput];
+            const numSequence = [0, 100, 500, 1000, 500, 0];
+            for (const input of numberInputs) {
+                allDOMControls.statusDiv.textContent = `Testing: ${input.id}`;
+                const originalValue = input.value;
+                for (const value of numSequence) {
+                    input.value = value; triggerUpdate(input); await delay(250);
+                }
+                input.value = originalValue; triggerUpdate(input);
+            }
+
+            const sliders = document.querySelectorAll('input[type="range"]');
+            for (const slider of sliders) {
+                 allDOMControls.statusDiv.textContent = `Testing: ${slider.id}`;
+                 const originalValue = slider.value;
+                 const min = parseFloat(slider.min);
+                 const max = parseFloat(slider.max);
+                 for(let i=min; i<=max; i+= (max-min)/20) {
+                     slider.value = i; triggerUpdate(slider); await delay(50);
+                 }
+                 for(let i=max; i>=min; i-= (max-min)/20) {
+                     slider.value = i; triggerUpdate(slider); await delay(50);
+                 }
+                 slider.value = originalValue; triggerUpdate(slider);
+            }
+
+        } finally {
+            isTesting = false;
+            controlsToDisable.forEach(el => el.disabled = false);
+            allDOMControls.statusDiv.textContent = 'Testing Complete. Ready.';
+        }
+    };
+
 
     const start = () => {
         const mainContainer = document.getElementById('main-container');
@@ -420,15 +612,23 @@
         updateFromEditor();
 
         document.querySelectorAll('#editor input').forEach(input => input.addEventListener('input', updateFromEditor));
-        fontUpload.addEventListener('change', handleFontUpload);
-        infoButton.addEventListener('click', () => infoModal.classList.remove('hidden'));
-        closeModalButton.addEventListener('click', () => infoModal.classList.add('hidden'));
-        startCaptureBtn.addEventListener('click', startCapture);
-        captureDurationSlider.addEventListener('input', () => captureDurationValue.textContent = captureDurationSlider.value);
-        subtitleFadeInDelayInput.addEventListener('input', () => subtitleFadeInDelayValue.textContent = `${parseFloat(subtitleFadeInDelayInput.value).toFixed(1)}s`);
-        subtitleFadeDurationInput.addEventListener('input', () => subtitleFadeDurationValue.textContent = `${parseFloat(subtitleFadeDurationInput.value).toFixed(1)}s`);
+        allDOMControls.fontUpload.addEventListener('change', handleFontUpload);
+        allDOMControls.infoButton.addEventListener('click', () => allDOMControls.infoModal.classList.remove('hidden'));
+        allDOMControls.closeModalButton.addEventListener('click', () => allDOMControls.infoModal.classList.add('hidden'));
+        allDOMControls.startCaptureBtn.addEventListener('click', startCapture);
+        allDOMControls.runTestsBtn.addEventListener('click', runQuickTests);
+        allDOMControls.debugToggleBtn.addEventListener('click', () => {
+            config.debugEnabled = !config.debugEnabled;
+            allDOMControls.debugToggleBtn.classList.toggle('active', config.debugEnabled);
+        });
+        allDOMControls.captureDurationSlider.addEventListener('input', () => allDOMControls.captureDurationValue.textContent = `${allDOMControls.captureDurationSlider.value}s`);
+        allDOMControls.subtitleFadeInDelayInput.addEventListener('input', () => allDOMControls.subtitleFadeInDelayValue.textContent = `${parseFloat(allDOMControls.subtitleFadeInDelayInput.value).toFixed(1)}s`);
+        allDOMControls.subtitleFadeDurationInput.addEventListener('input', () => allDOMControls.subtitleFadeDurationValue.textContent = `${parseFloat(allDOMControls.subtitleFadeDurationInput.value).toFixed(1)}s`);
+        allDOMControls.glowBlurInput.addEventListener('input', () => allDOMControls.glowBlurValue.textContent = `${allDOMControls.glowBlurInput.value}px`);
+        allDOMControls.glowIntensityInput.addEventListener('input', () => allDOMControls.glowIntensityValue.textContent = allDOMControls.glowIntensityInput.value);
         
         startTime = Date.now();
+        lastFrameTime = startTime;
         animate();
     };
 
