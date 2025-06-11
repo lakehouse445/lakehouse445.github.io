@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Wavy Text Editor & Exporter</title>
+    <title>Simple Wavy Text with Editor & Exporter</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         body {
@@ -184,7 +184,6 @@
                 <li>Unzip the downloaded file into a new folder.</li>
                 <li><strong>IMPORTANT:</strong> Copy your <code>ffmpeg.exe</code> file into that same folder.</li>
                 <li>Double-click the <code>create_video.bat</code> file to create the final <code>.mp4</code> video.</li>
-                <li>This was based on <code>https://codepen.io/adelciotto/pen/bePLZE</code></li>
             </ol>
             <button id="close-modal-button">Close</button>
         </div>
@@ -271,6 +270,10 @@
              <div class="options-toggle">
                 <input type="checkbox" id="upscaleCheckbox">
                 <label for="upscaleCheckbox">Upscale 2x on Capture</label>
+             </div>
+             <div class="options-toggle">
+                <input type="checkbox" id="lockToCycleCheckbox">
+                <label for="lockToCycleCheckbox">Lock to Cycle</label>
             </div>
             <div id="status">Ready</div>
         </div>
@@ -284,7 +287,7 @@
         waveSpeed: 250,
         textToAnimate: 'New text',
         fontSize: 55,
-        kerning: 1,
+        kerning: 10,
         fontFamily: 'Courier New',
         glowEnabled: false,
         glowBlur: 10,
@@ -331,7 +334,8 @@
         glowIntensityInput: document.getElementById('glowIntensityInput'),
         glowIntensityValue: document.getElementById('glowIntensityValue'),
         runTestsBtn: document.getElementById('runTestsBtn'),
-        debugToggleBtn: document.getElementById('debug-toggle-btn')
+        debugToggleBtn: document.getElementById('debug-toggle-btn'),
+        lockToCycleCheckbox: document.getElementById('lockToCycleCheckbox')
     };
 
 
@@ -496,6 +500,7 @@
         const originalConfig = { ...config };
         let captureConfig = { ...config };
         const scaleFactor = allDOMControls.upscaleCheckbox.checked ? 2 : 1;
+        const lockToCycle = allDOMControls.lockToCycleCheckbox.checked;
         
         if (scaleFactor > 1) {
             allDOMControls.statusDiv.textContent = 'Scaling config for capture...';
@@ -508,7 +513,7 @@
         }
 
         const frameRate = 120;
-        const totalFrames = durationSeconds * frameRate;
+        let totalFrames = durationSeconds * frameRate;
         const zip = new JSZip();
 
         allDOMControls.statusDiv.textContent = 'Starting capture...';
@@ -525,6 +530,42 @@
                 allDOMControls.statusDiv.textContent = `Captured frame ${i + 1} of ${totalFrames}`;
                 if (i % 10 === 0) await new Promise(resolve => setTimeout(resolve, 0));
             }
+            
+            if (lockToCycle && charObjs.length > 0) {
+                allDOMControls.statusDiv.textContent = 'Finding perfect loop point...';
+                await new Promise(resolve => setTimeout(resolve, 0)); // UI update
+                
+                const lastChar = charObjs[charObjs.length - 1];
+                const y_start = Math.sin(lastChar.index / 2.5) * captureConfig.amplitude;
+                const targetHue = ((y_start + captureConfig.amplitude) / (captureConfig.amplitude * 2)) * 240;
+                const startDerivativeSign = Math.sign(Math.cos(lastChar.index / 2.5));
+
+                let extraFrames = 0;
+                const maxExtraFrames = frameRate * 10; // 10 second safety limit
+
+                while (extraFrames < maxExtraFrames) {
+                    const i = totalFrames + extraFrames;
+                    const time = i * (1000 / frameRate);
+                    
+                    const y_current = Math.sin(time / captureConfig.waveSpeed + lastChar.index / 2.5) * captureConfig.amplitude;
+                    const currentHue = ((y_current + captureConfig.amplitude) / (captureConfig.amplitude * 2)) * 240;
+                    const currentDerivativeSign = Math.sign(Math.cos(time / captureConfig.waveSpeed + lastChar.index / 2.5));
+
+                    drawFrameAtTime(time, captureConfig, true);
+                    const frameName = `frame_${String(i).padStart(5, '0')}.png`;
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    zip.file(frameName, blob);
+                    allDOMControls.statusDiv.textContent = `Finding loop point... (Frame ${i + 1})`;
+
+                    if (Math.abs(currentHue - targetHue) < 1.0 && startDerivativeSign === currentDerivativeSign) {
+                        break; 
+                    }
+                    
+                    extraFrames++;
+                    if (extraFrames % 10 === 0) await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+
 
             allDOMControls.statusDiv.textContent = 'Creating FFmpeg batch file...';
             const batContent = `@echo off\r\ncd /d "%~dp0"\r\nffmpeg -framerate ${frameRate} -i frame_%%05d.png -c:v libx264 -pix_fmt yuv420p -r ${frameRate} output.mp4\r\npause`;
@@ -563,7 +604,7 @@
         const triggerUpdate = (el) => el.dispatchEvent(new Event('input', { bubbles: true }));
 
         try {
-            const checkboxes = [allDOMControls.glowCheckbox, allDOMControls.subtitleCheckbox, allDOMControls.upscaleCheckbox];
+            const checkboxes = [allDOMControls.glowCheckbox, allDOMControls.subtitleCheckbox, allDOMControls.upscaleCheckbox, allDOMControls.lockToCycleCheckbox];
             for (const box of checkboxes) {
                 allDOMControls.statusDiv.textContent = `Testing: ${box.id}`;
                 box.checked = true; triggerUpdate(box); await delay(500);
