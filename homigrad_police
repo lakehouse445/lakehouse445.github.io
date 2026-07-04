@@ -130,7 +130,7 @@
     <header>
         <img src="https://lakehouse.ink/badge%20(2).png" alt="Badge" class="badge">
         <marquee behavior="scroll" direction="left" scrollamount="6">
-            Welcome to Harrison's Homigrad! Moderation in Action. Keep it clean, keep it cool.
+            Welcome to Harrison's Homigrad! Moderation in Action. Keep it clean, keep it cool. Please note, this site was taken down back in 2024, but since Harrison's homigrad is no longer around, I am going to put it back up!
         </marquee>
     </header>
     <nav>
@@ -153,16 +153,16 @@
     <div class="duties">
         <h2>Our Duties</h2>
         <ul>
-            <li>Monitoring meme traffic flow to ensure no illegal duplication occurs.</li>
-            <li>Conducting thorough audits on profile pictures for alignment with current aesthetic standards.</li>
-            <li>Ensuring digital files adhere to a strict 12-point naming convention.</li>
-            <li>Reviewing all posts flagged for subjective irrelevance by at least three users within a 90-second window.</li>
-            <li>Maintaining a comprehensive database of "unofficial" emojis for compliance with cross-platform standards.</li>
-            <li>Implementing situational awareness protocols for content that exceeds expected engagement benchmarks.</li>
+            <li>Monitoring traffic flow to ensure no illegal duplication occurs.</li>
+            <li>Conducting audits on profile pictures for alignment with current rules.</li>
+            <li>Ensuring digital files adhere to the TOS.</li>
+            <li>Reviewing all posts flagged for disturbing content by at least three users within a 90-second window.</li>
+            <li>Maintaining a comprehensive database of reports for compliance with cross-platform standards.</li>
+            <li>Implementing situational awareness protocols for content that breaks rules.</li>
         </ul>
     </div>
     <div class="footer">
-        <p>Copyright © 2024 Lakehouse & Friends</p>
+        <p>Copyright © 2026 Lakehouse & Friends</p>
     </div>
     <script>
         function showEmploymentText() {
