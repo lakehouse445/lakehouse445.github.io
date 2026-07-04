@@ -39,6 +39,61 @@
         margin: 20px;
         font-size: 14px;
         }
+        #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        cursor: pointer;
+        z-index: 10;
+        padding: 20px;
+        box-sizing: border-box;
+        transition: opacity 1.5s ease;
+        }
+        #overlay.fade-out {
+        opacity: 0;
+        pointer-events: none;
+        }
+        #overlay .title {
+        font-size: 18px;
+        letter-spacing: 4px;
+        margin-bottom: 24px;
+        }
+        #overlay .line {
+        font-size: 14px;
+        margin: 4px 0;
+        max-width: 520px;
+        }
+        #overlay .dim {
+        color: #888;
+        }
+        #overlay .connect {
+        margin-top: 32px;
+        font-size: 14px;
+        }
+        .cursor {
+        display: inline-block;
+        animation: blink 1s steps(1) infinite;
+        }
+        @keyframes blink {
+        50% {
+        opacity: 0;
+        }
+        }
+        #terminal {
+        opacity: 0;
+        transition: opacity 1.5s ease;
+        }
+        #terminal.fade-in {
+        opacity: 1;
+        }
     </style>
     <script>
         // Add your chat data here
@@ -47,47 +102,220 @@
         { "time": "20:53:40", "content": "*** Topic is 'Welcome to #deepwebchat - WE DO NOT CONDONE ILLEGAL ACTIVITY - STRICTLY FOR ANONYMOUS CHAT ONLY!' ***" },
         { "time": "20:54:01", "content": "<anon847> hey wassup y'all" },
         { "time": "20:54:12", "content": "<random42> nm, u?" },
-        { "time": "20:54:17", "content": "<anon847> chillin, lookin for some good shit" },
-        { "time": "20:54:27", "content": "<darknetx> u in the wrong place bro, this ain't a marketplace" },
-        { "time": "20:54:34", "content": "<anon847> nah, i know. just chattin" },
-        { "time": "20:54:45", "content": "<random42> aight, fair enough" },
+        { "time": "20:54:17", "content": "<anon847> chillin. slow night?" },
+        { "time": "20:54:27", "content": "<darknetx> every night is a slow night in here man, that's the appeal" },
+        { "time": "20:54:34", "content": "<anon847> lol fair" },
+        { "time": "20:54:45", "content": "<random42> it's like a dive bar but with worse lighting" },
         { "time": "20:54:58", "content": "<hackerguy69> anyone got any good onion links? i'm bored af" },
-        { "time": "20:55:09", "content": "<darknetx> @hackerguy69, check out this game, it's sick" },
+        { "time": "20:55:09", "content": "<darknetx> @hackerguy69 check out this game, it's sick" },
         { "time": "20:55:11", "content": "<darknetx> [LINK REMOVED]" },
         { "time": "20:55:22", "content": "<hackerguy69> thx dude, gonna check it out" },
-        { "time": "20:55:30", "content": "<anon847> yo, anyone else hear about that new bitcoin market that just opened up?" },
-        { "time": "20:55:38", "content": "<darknetx> yh, but it's probably a scam like the rest" },
+        { "time": "20:55:30", "content": "<anon847> yo anyone else hear about that new market that just opened up" },
+        { "time": "20:55:38", "content": "<darknetx> probably a scam like the rest" },
         { "time": "20:55:42", "content": "<random42> don't trust anyone, man" },
-        { "time": "20:55:52", "content": "<hackerguy69> yeah, i ain't touchin that shit. got burned too many times" },
-        { "time": "20:56:03", "content": "<anon847> fk, it's so hard to find a legit spot these days" },
-        { "time": "20:56:09", "content": "<random42> story of my life, bro" },
-        { "time": "20:56:25", "content": "<darknetx> just stick with the well-known markets, better safe than sorry" },
-        { "time": "20:56:38", "content": "<anon847> yh, guess ur right" },
-        { "time": "20:56:53", "content": "<hackerguy69> lmao, this game is crazy. nice find @darknetx" },
-        { "time": "20:57:01", "content": "<darknetx> lol, i told u man, enjoy" },
-        { "time": "20:57:13", "content": "<random42> wtf, just saw this vid on youtube that's supposed to be real footage of a ufo" },
-        { "time": "20:57:22", "content": "<anon847> lol, probs fake af" },
-        { "time": "20:57:30", "content": "<darknetx> yeah, 99% always fake" },
-        { "time": "20:57:44", "content": "<hackerguy69> if it's on youtube, it's def fake lol" },
-        { "time": "20:57:52", "content": "<random42> hahaha tru, tru" },
-        { "time": "20:58:00", "content": "<anon847> better keep lookin, then. i'm off" },
-        { "time": "20:58:10", "content": "<anon847> stay safe peeps" },
-        { "time": "20:58:15", "content": "<random42> peace out, man" },
-        { "time": "20:58:19", "content": "<darknetx> later dude" },
-        { "time": "20:58:22", "content": "<hackerguy69> cya" },
-        { "time": "20:58:25", "content": "*** anon847 has quit IRC (Quit: Leaving...) ***" },
-        { "time": "20:58:37", "content": "*** random42 is away: afk, will be back later ***" },
-        { "time": "20:58:44", "content": "<hackerguy69> so, what's everyone else up to?" },
-        { "time": "20:58:52", "content": "<darknetx> just browsin, tryna find somethin interesting" },
-        { "time": "20:59:02", "content": "<hackerguy69> same here, ain't shit goin on tonight" },
+        { "time": "20:55:52", "content": "<hackerguy69> yeah i ain't touchin that. got burned too many times" },
+        { "time": "20:56:03", "content": "<anon847> everything's a honeypot these days lol" },
+        { "time": "20:56:09", "content": "<random42> story of my life bro" },
+        { "time": "20:56:25", "content": "<darknetx> anyway. attendance check" },
+        { "time": "20:56:31", "content": "<darknetx> day 19" },
+        { "time": "20:56:40", "content": "<hackerguy69> ..." },
+        { "time": "20:56:48", "content": "<anon847> day 19 of what" },
+        { "time": "20:56:59", "content": "<random42> wraith hasn't logged on in 19 days" },
+        { "time": "20:57:06", "content": "<random42> darknetx keeps count" },
+        { "time": "20:57:15", "content": "<anon847> oh. the quiet dude with the ascii art?" },
+        { "time": "20:57:24", "content": "<darknetx> the quiet dude with the ascii art. yeah" },
+        { "time": "20:57:36", "content": "<hackerguy69> he's been on this channel longer than any of us except x" },
+        { "time": "20:57:44", "content": "<hackerguy69> we literally started it together. 2019. me, him, and a guy called nullpointer who got a girlfriend and vanished lmao" },
+        { "time": "20:57:52", "content": "<anon847> the classic exit" },
+        { "time": "20:58:00", "content": "<random42> the only honorable exit" },
+        { "time": "20:58:10", "content": "<darknetx> wraith never missed more than 3 days. ever. in like 6 years" },
+        { "time": "20:58:19", "content": "<darknetx> even when his internet died he'd tether off his phone just to say 'still here'" },
+        { "time": "20:58:25", "content": "<anon847> maybe he just needed a break from us degens" },
+        { "time": "20:58:33", "content": "<hackerguy69> nah. not wraith" },
+        { "time": "20:58:41", "content": "<hackerguy69> he told me once this was the only place he actually talked" },
+        { "time": "20:58:52", "content": "<random42> honestly? same" },
+        { "time": "20:59:02", "content": "<random42> like... don't make it weird but i lost my job three weeks ago and this channel is the only place i've said that out loud" },
         { "time": "20:59:08", "content": "[MESSAGE FAILURE]" },
-        { "time": "20:59:19", "content": "<hackerguy69> aight, i'm out. maybe i'll be back later" },
-        { "time": "20:59:24", "content": "<darknetx> cool, man. take care" },
-        { "time": "20:59:29", "content": "*** hackerguy69 has quit IRC (Quit: Leaving...) ***" },
-        { "time": "20:59:35", "content": "<darknetx> and then there was one..." },
-        { "time": "20:59:40", "content": "*** darknetx is away: afk, will be back later ***" }
+        { "time": "20:59:15", "content": "<random42> msg ate itself. anyway. yeah. laid off. whole department" },
+        { "time": "20:59:24", "content": "<hackerguy69> damn man. that sucks" },
+        { "time": "20:59:31", "content": "<darknetx> that's rough. how are you holding up for real" },
+        { "time": "20:59:45", "content": "<random42> weird mix of terrified and relieved? i hated that place. but rent doesn't care that i hated it" },
+        { "time": "20:59:58", "content": "<anon847> been there. it gets less sharp. doesn't feel like it will but it does" },
+        { "time": "21:00:10", "content": "<random42> thanks. genuinely" },
+        { "time": "21:00:22", "content": "<random42> see this is what i mean. i can't say this stuff to people who know my face" },
+        { "time": "21:00:31", "content": "<hackerguy69> that's the whole deal in here. nobody knows anybody so everybody knows everybody" },
+        { "time": "21:00:40", "content": "<darknetx> hackerguy69 accidentally saying something profound, screenshot it" },
+        { "time": "21:00:47", "content": "<hackerguy69> delete that from the record immediately" },
+        { "time": "21:00:55", "content": "<anon847> too late, it's canon" },
+        { "time": "21:01:10", "content": "<random42> wraith used to do that. drop one perfect line and then go silent for an hour" },
+        { "time": "21:01:19", "content": "<darknetx> 'lurking is listening' he called it" },
+        { "time": "21:01:30", "content": "<hackerguy69> remember when he stayed up all night walking me through my chess engine bug" },
+        { "time": "21:01:38", "content": "<hackerguy69> 4am and he's typing paragraphs about move ordering like it's noon" },
+        { "time": "21:01:50", "content": "<darknetx> he did that for me once too. not chess. just... a bad night. the worst one i've had" },
+        { "time": "21:02:02", "content": "<darknetx> he stayed on until sunrise. never brought it up again. never made it a thing" },
+        { "time": "21:02:14", "content": "<random42> he was good at that. being there without making it heavy" },
+        { "time": "21:02:25", "content": "<anon847> ok now i feel bad i barely talked to the guy" },
+        { "time": "21:02:33", "content": "<hackerguy69> he liked you. said your usernames get worse every year and he respected the commitment" },
+        { "time": "21:02:41", "content": "<anon847> LOL ok that's the nicest insult i've ever received" },
+        { "time": "21:02:55", "content": "<darknetx> should we be worried? like actually" },
+        { "time": "21:03:04", "content": "<hackerguy69> we don't even know his real name man. what would we do, file a missing persons report for 'wraith, address: the internet'" },
+        { "time": "21:03:16", "content": "<random42> that's the trade we all made isn't it. nobody can find us. and we can't find each other" },
+        { "time": "21:03:29", "content": "<darknetx> ...yeah" },
+        { "time": "21:03:38", "content": "<darknetx> anyway. day 19. logged. moving on" },
+        { "time": "21:03:50", "content": "<anon847> he'll turn up. probably rebuilding his whole setup from scratch or something" },
+        { "time": "21:04:01", "content": "<hackerguy69> lol yeah he did that once. gone 3 days, came back like 'i use arch now'" },
+        { "time": "21:04:09", "content": "<random42> the most wraith sentence ever typed" },
+        { "time": "21:06:10", "content": "<hackerguy69> ok this game x linked is actually ruining my life, i've been playing for 10 minutes and i'm furious" },
+        { "time": "21:06:18", "content": "<darknetx> told you it's sick" },
+        { "time": "21:06:25", "content": "<hackerguy69> 'sick' he says. it's psychological warfare" },
+        { "time": "21:06:36", "content": "<anon847> link me i want to suffer too" },
+        { "time": "21:06:41", "content": "<darknetx> [LINK REMOVED]" },
+        { "time": "21:06:52", "content": "<anon847> ty. pouring one out for my evening" },
+        { "time": "21:07:05", "content": "<random42> wtf just saw a vid that's supposed to be real ufo footage" },
+        { "time": "21:07:13", "content": "<anon847> lol probs fake af" },
+        { "time": "21:07:21", "content": "<darknetx> 99% always fake" },
+        { "time": "21:07:29", "content": "<hackerguy69> if it's on youtube it's def fake" },
+        { "time": "21:07:38", "content": "<random42> hahaha tru tru" },
+        { "time": "21:07:49", "content": "<random42> wraith would've watched the whole thing frame by frame and posted a debunk with timestamps" },
+        { "time": "21:07:58", "content": "<hackerguy69> with ascii diagrams" },
+        { "time": "21:08:05", "content": "<darknetx> god. the ascii diagrams" },
+        { "time": "21:08:17", "content": "<anon847> we're doing it again" },
+        { "time": "21:08:24", "content": "<darknetx> doing what" },
+        { "time": "21:08:32", "content": "<anon847> talking about him in past tense" },
+        { "time": "21:08:45", "content": "<hackerguy69> ..." },
+        { "time": "21:08:53", "content": "<random42> yeah. let's not do that" },
+        { "time": "21:11:30", "content": "*** wraith has joined #deepwebchat ***" },
+        { "time": "21:11:36", "content": "<hackerguy69> WRAITH" },
+        { "time": "21:11:38", "content": "<darknetx> HOLY" },
+        { "time": "21:11:40", "content": "<random42> LOOK WHO IT IS" },
+        { "time": "21:11:42", "content": "<hackerguy69> 19 DAYS DUDE. NINETEEN. x kept count like a lighthouse keeper" },
+        { "time": "21:11:49", "content": "<anon847> the legend returns" },
+        { "time": "21:11:57", "content": "<darknetx> where the hell have you been man, you had us actually worried" },
+        { "time": "21:12:39", "content": "<wraith> hello. i'm sorry, i don't really know how to do this" },
+        { "time": "21:12:47", "content": "<hackerguy69> lol what, type? it's been 19 days not 19 years" },
+        { "time": "21:13:06", "content": "<wraith> this isn't wraith. i'm his sister" },
+        { "time": "21:13:19", "content": "<darknetx> what" },
+        { "time": "21:13:42", "content": "<wraith> i've been going through his things and his laptop was still on. this chat program opened by itself when i turned the screen on. there were a lot of messages waiting. a lot of them were asking where he was" },
+        { "time": "21:13:58", "content": "<hackerguy69> going through his things" },
+        { "time": "21:14:05", "content": "<hackerguy69> why are you going through his things" },
+        { "time": "21:14:31", "content": "<wraith> my brother passed away two weeks ago. he was sick for a while. he didn't tell many people. i think maybe he didn't tell anyone" },
+        { "time": "21:14:46", "content": "<random42> no" },
+        { "time": "21:14:53", "content": "<anon847> ..." },
+        { "time": "21:15:08", "content": "<darknetx> i'm sorry but i have to ask. how do we know this is real. this is that kind of internet, people do sick jokes" },
+        { "time": "21:15:47", "content": "<wraith> that's fair. he warned me you'd say that actually. not you specifically. he left notes" },
+        { "time": "21:16:00", "content": "<hackerguy69> notes" },
+        { "time": "21:16:42", "content": "<wraith> a notebook. paper. which is funny for someone who lived on a computer. there's a page with all your names on it. he wrote 'if it comes to it, tell darknetx the count can stop. tell hackerguy69 he still owes me a rematch and he knows the game and he knows he lost the first one on purpose is a lie'" },
+        { "time": "21:17:08", "content": "<hackerguy69> oh my god" },
+        { "time": "21:17:17", "content": "<hackerguy69> nobody knows about that. NOBODY knows about that" },
+        { "time": "21:17:29", "content": "<darknetx> 'the count can stop'" },
+        { "time": "21:17:38", "content": "<darknetx> he knew i counted. i never told him i counted" },
+        { "time": "21:17:57", "content": "<random42> i can't breathe rn" },
+        { "time": "21:18:26", "content": "<wraith> i'm so sorry to do it like this. i didn't know how else to reach you. there's no phone numbers. no emails. just this window" },
+        { "time": "21:18:45", "content": "<anon847> you did the right thing. most people would've just closed the laptop" },
+        { "time": "21:19:07", "content": "<wraith> i almost did. but the messages kept coming in while i was sitting there. 'day 12.' 'day 15.' 'still keeping your seat warm.' i couldn't just let them keep arriving to no one" },
+        { "time": "21:19:29", "content": "<hackerguy69> that was me. the seat warm one" },
+        { "time": "21:19:37", "content": "<hackerguy69> i sent that at like 3am. i felt stupid sending it" },
+        { "time": "21:19:58", "content": "<wraith> please don't feel stupid. i read all of them. it's the only reason i knew he had people" },
+        { "time": "21:20:17", "content": "<darknetx> he had people. he definitely had people" },
+        { "time": "21:20:39", "content": "<random42> what was he sick with. if that's ok to ask" },
+        { "time": "21:21:11", "content": "<wraith> his heart. it was congenital, he'd known since he was a kid it might go this way. he hated hospitals and he hated being looked at like he was fragile. i think that's part of why he liked it here. you all just talked to him like a person" },
+        { "time": "21:21:30", "content": "<hackerguy69> we didn't know. six years and we didn't know" },
+        { "time": "21:21:52", "content": "<wraith> he didn't want you to. the notebook says, and i'm quoting, 'they're the only room i walk into where i'm not the sick one'" },
+        { "time": "21:22:07", "content": "<darknetx> ok i need a minute" },
+        { "time": "21:22:15", "content": "*** darknetx is away ***" },
+        { "time": "21:22:47", "content": "<anon847> for what it's worth, and i was the newest one here, he was the reason this place felt safe. you'd say something dumb and he'd find the one smart thing buried in it" },
+        { "time": "21:23:11", "content": "<random42> three weeks ago i almost typed about losing my job and chickened out. he dm'd me. one line. 'whatever it is, the channel can hold it'" },
+        { "time": "21:23:22", "content": "<random42> i only said it out loud tonight. an hour ago. before you logged on" },
+        { "time": "21:23:41", "content": "<wraith> he would have liked that timing i think. he had a thing about doors. it's all over the notebook. 'leave the door open' over and over" },
+        { "time": "21:24:03", "content": "*** darknetx is back ***" },
+        { "time": "21:24:17", "content": "<darknetx> sorry. ok. i'm here" },
+        { "time": "21:24:42", "content": "<darknetx> i need to say something and i'm only going to say it once. four years ago i was in a very bad place. the kind you don't come back from by accident. he stayed on with me until the sun came up. he never mentioned it again. i am typing this message right now because of him. that's it. that's the whole story" },
+        { "time": "21:25:08", "content": "<hackerguy69> x..." },
+        { "time": "21:25:19", "content": "<random42> man" },
+        { "time": "21:25:57", "content": "<wraith> thank you for telling me that. the last few weeks i've been wondering if his life was small. it wasn't, was it" },
+        { "time": "21:26:11", "content": "<darknetx> no. it was not" },
+        { "time": "21:26:28", "content": "<anon847> can i ask something" },
+        { "time": "21:26:35", "content": "<anon847> what was his name. his actual name" },
+        { "time": "21:26:57", "content": "<hackerguy69> we don't have to. if he wanted to be wraith he can stay wraith" },
+        { "time": "21:27:32", "content": "<wraith> no, he answered this one too. the notebook says 'if they ask, tell them. a ghost should get to be a person at the end'" },
+        { "time": "21:27:49", "content": "<wraith> his name was eli. he was 29. he liked film photography and terrible instant coffee and he could not whistle no matter how hard he tried, and he tried constantly, it drove our whole family insane" },
+        { "time": "21:28:07", "content": "<hackerguy69> eli" },
+        { "time": "21:28:14", "content": "<random42> eli" },
+        { "time": "21:28:20", "content": "<anon847> eli. it fits somehow" },
+        { "time": "21:28:37", "content": "<darknetx> six years of 'wraith' and the whole time there's a guy named eli failing to whistle at his keyboard" },
+        { "time": "21:28:49", "content": "<wraith> ha. yes. that's exactly right. that's exactly who was on the other side of this window" },
+        { "time": "21:29:12", "content": "<hackerguy69> the rematch btw. it was chess. i beat him ONCE in six years and told everyone i let him win the first game to save face. he never let it go" },
+        { "time": "21:29:28", "content": "<hackerguy69> he was right. i didn't lose on purpose. he just destroyed me" },
+        { "time": "21:29:42", "content": "<wraith> he wrote 'he knows.' underlined. twice" },
+        { "time": "21:29:51", "content": "<hackerguy69> LOOOL even now. even NOW he wins" },
+        { "time": "21:30:05", "content": "<random42> undefeated forever. what a way to go out" },
+        { "time": "21:30:29", "content": "<darknetx> when is the funeral. if you're allowed to say" },
+        { "time": "21:31:02", "content": "<wraith> thursday. it will be small. i had a thought and you can say no. i could bring the laptop. leave this window open during the service. i know you can't come. but the door could be open" },
+        { "time": "21:31:18", "content": "<random42> yes" },
+        { "time": "21:31:20", "content": "<hackerguy69> yes" },
+        { "time": "21:31:22", "content": "<anon847> yes" },
+        { "time": "21:31:31", "content": "<darknetx> we'll be there. all of us. thursday" },
+        { "time": "21:31:57", "content": "<wraith> ok. thank you. i was so scared to press enter on that first message. i thought you'd think i was a scam or a bot" },
+        { "time": "21:32:12", "content": "<hackerguy69> we did for like 90 seconds. then you brought receipts lol" },
+        { "time": "21:32:27", "content": "<wraith> he said you'd say that too" },
+        { "time": "21:32:37", "content": "<hackerguy69> UNBELIEVABLE" },
+        { "time": "21:32:52", "content": "<darknetx> before you go. one thing. everyone stop typing for a minute. i mean it. sixty seconds. for eli" },
+        { "time": "21:33:07", "content": "<darknetx> starting now" },
+        { "time": "21:34:08", "content": "<darknetx> ok" },
+        { "time": "21:34:19", "content": "<random42> that's the longest this channel has ever been quiet" },
+        { "time": "21:34:28", "content": "<anon847> felt right though" },
+        { "time": "21:34:42", "content": "<wraith> i should go. it's late here and tomorrow is a hard day. but i'll be back thursday. and maybe after, if that's allowed. i'd like to know the people my brother knew" },
+        { "time": "21:35:01", "content": "<darknetx> the door stays open. that's the rule now" },
+        { "time": "21:35:15", "content": "<wraith> he'd like that rule. goodnight everyone. thank you for six years of him being not the sick one" },
+        { "time": "21:35:29", "content": "<hackerguy69> goodnight. thursday" },
+        { "time": "21:35:33", "content": "<random42> thursday" },
+        { "time": "21:35:36", "content": "<anon847> thursday" },
+        { "time": "21:35:42", "content": "*** wraith has quit IRC (Quit: Leaving...) ***" },
+        { "time": "21:36:17", "content": "<hackerguy69> i don't know what to do with my hands rn" },
+        { "time": "21:36:32", "content": "<random42> i've cried twice tonight over a guy whose face i never saw" },
+        { "time": "21:36:47", "content": "<anon847> is that weird? it doesn't feel weird" },
+        { "time": "21:37:05", "content": "<darknetx> it's not weird. he heard us. that's what a friend is. everything else is decoration" },
+        { "time": "21:37:28", "content": "*** darknetx changes topic to 'for eli. the door stays open.' ***" },
+        { "time": "21:37:42", "content": "<hackerguy69> ...yeah. yeah that's the topic now. forever" },
+        { "time": "21:37:57", "content": "<random42> forever" },
+        { "time": "21:38:29", "content": "<anon847> i'm gonna head out. gonna call my brother actually. haven't in a while" },
+        { "time": "21:38:41", "content": "<darknetx> good. do that" },
+        { "time": "21:38:47", "content": "<anon847> night everyone. see you thursday" },
+        { "time": "21:38:53", "content": "*** anon847 has quit IRC (Quit: Leaving...) ***" },
+        { "time": "21:39:37", "content": "<random42> i should sleep too. job hunt in the morning. the channel can hold it, right?" },
+        { "time": "21:39:49", "content": "<darknetx> the channel can hold it" },
+        { "time": "21:39:57", "content": "<random42> night x. night hackerguy. day 1 of the rest of it i guess" },
+        { "time": "21:40:05", "content": "*** random42 has quit IRC (Quit: Leaving...) ***" },
+        { "time": "21:40:42", "content": "<hackerguy69> just us. like 2019" },
+        { "time": "21:40:55", "content": "<darknetx> like 2019. minus one" },
+        { "time": "21:41:17", "content": "<hackerguy69> i'm setting up the chess board thursday. leaving his side untouched. dumbest thing i've ever done and i'm doing it" },
+        { "time": "21:41:31", "content": "<darknetx> it's not dumb. it's the rematch. he shows up or he forfeits" },
+        { "time": "21:41:42", "content": "<hackerguy69> LOL. finally. a win" },
+        { "time": "21:41:57", "content": "<hackerguy69> night x. don't sit here alone all night" },
+        { "time": "21:42:05", "content": "<darknetx> i won't. night man" },
+        { "time": "21:42:11", "content": "*** hackerguy69 has quit IRC (Quit: Leaving...) ***" },
+        { "time": "21:42:47", "content": "<darknetx> and then there was one..." },
+        { "time": "21:43:08", "content": "<darknetx> not alone though. never was" },
+        { "time": "21:43:26", "content": "<darknetx> night, eli. count's stopped. door's open" },
+        { "time": "21:43:37", "content": "*** darknetx is away: back thursday ***" }
         ];
         document.addEventListener("DOMContentLoaded", function() {
+        const overlay = document.getElementById("overlay");
+        const terminal = document.getElementById("terminal");
+        const totalSeconds = getTimeDifference(chatData[0].time, chatData[chatData.length - 1].time);
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        document.getElementById("runtime").textContent = "total runtime: " + mins + " min " + secs + " sec";
+        overlay.addEventListener("click", function() {
+        overlay.classList.add("fade-out");
+        setTimeout(function() {
+        overlay.style.display = "none";
+        terminal.classList.add("fade-in");
+        startPlayback();
+        }, 1500);
+        }, { once: true });
+        });
+        function startPlayback() {
         const chatlog = document.getElementById("chatlog");
         let totalDelay = 0;
         chatData.forEach(function(data, i) {
@@ -99,7 +327,7 @@
         chatlog.appendChild(message);
         }, totalDelay);
         });
-        });
+        }
         function getTimeDifference(time1, time2) {
         const t1 = time1.split(':').map(t => parseInt(t, 10));
         const t2 = time2.split(':').map(t => parseInt(t, 10));
@@ -109,8 +337,19 @@
 </head>
 
 <body>
-    <div id="marquee"><span> 'Welcome to #deepwebchat - WE DO NOT CONDONE ILLEGAL ACTIVITY - STRICTLY FOR ANONYMOUS CHAT ONLY!' ***</span></div>
-    <div id="chatlog"></div>
+    <div id="overlay">
+        <div class="title">#deepwebchat</div>
+        <div class="line dim">-- session log: recovered --</div>
+        <div class="line" id="runtime">total runtime: -- min -- sec</div>
+        <div class="line">this log replays in real time.</div>
+        <div class="line dim">there are stretches where minutes pass and nothing happens.</div>
+        <div class="line dim">that is part of it. leave it running.</div>
+        <div class="connect">[ click anywhere to connect ]<span class="cursor">_</span></div>
+    </div>
+    <div id="terminal">
+        <div id="marquee"><span> 'Welcome to #deepwebchat - WE DO NOT CONDONE ILLEGAL ACTIVITY - STRICTLY FOR ANONYMOUS CHAT ONLY!' ***</span></div>
+        <div id="chatlog"></div>
+    </div>
 </body>
 
 </html>
